@@ -1,8 +1,8 @@
 #$ -S /bin/bash
-#$ -t 1-2290
+#$ -t 1-18998
 #$ -o /home/zzj/temp
 #$ -j y
 #$ -q all.q
 
-cd ~/Research/gamli/src/gex
-php  test.php config.json $SGE_TASK_ID
+cd ~/Research/gex
+php  test.php gse13870.json $SGE_TASK_ID
