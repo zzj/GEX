@@ -17,41 +17,66 @@
 include_once('lib/getCSVvalues.php');
 /* Load gene meta info file, create a dictionary with gene's position information */
 
+
+/* meta_idx is an array, and key is the probe id, and the value is position information
+   0 chr id
+   1 start position
+   2 end position
+*/
 function gex_load_gene_meta($config){
 
 	 if ($config->verbose){
 		  printf("Loading gene meta info\n");
 	 }
 	 
-	 $meta=file($config->gene_meta_file, $flag=FILE_IGNORE_NEW_LINES);
 	 $meta_idx=array();
-	 foreach ($meta as $key => $value){
-		  if ($key==0) continue;
-		  $content=getCSVvalues($value);
-		  $meta_idx[$content[0]]=array($content[$config->gene_meta_chr],$content[$config->gene_meta_start_position],$content[$config->gene_meta_end_position],$value);
-	 }
+
+     $meta=fopen($config->gene_meta_file, "r");
+     if ($meta){
+          $key=0;
+          while(($value=(fgets($meta,1000000))) !== false) {
+               $value=trim($value);
+               $key++;
+               if ($key==0) continue;
+               $content=getCSVvalues($value);
+               $meta_idx[$content[0]]=array($content[$config->gene_meta_chr],$content[$config->gene_meta_start_position],$content[$config->gene_meta_end_position]);
+          }
+          if (!feof($meta)) {
+               debug_print_backtrace();
+               die("Unexpected fgets fail\n");
+          }
+     }
+     else {
+          debug_print_backtrace();
+          die("Can not open file ".$config->gene_meta_file);
+     }
+          
 	 return $meta_idx;
 }
 
 
 function gex_init($config){
-     
      if (!file_exists($config->project_folder)){
           mkdir($config->project_folder);
      }
-     
      $resultfolder=$config->project_folder.$config->project_alias;
      if (!file_exists($resultfolder)){
           mkdir($resultfolder);
      }
      $infofile=$config->project_alias.".info";
-
+     /* find joint strain set from both genotype data and gene expression data*/
 	 $subject_list=gex_init_joint_strains($config);
 	 $subject_list=array_values($subject_list);
 	 printf("There are total ".count($subject_list)." strains founded in both datasets\n");
+
+     /* init gene expression data */
 	 $subject_list=gex_init_gene_expression($config,$subject_list);
-	 gex_dump_strain_list($config, $resultfolder, $subject_list);
+
+     /* init genotype data */
 	 gex_init_genotype($config,$subject_list);
+
+     /*The strain list must be dumped here, because the subject_list is right at this time*/
+	 gex_dump_strain_list($config, $resultfolder, $subject_list);
 }
 
 function gex_dump_strain_list($config, $resultfolder, $subject_list){
@@ -78,7 +103,7 @@ function gex_init_genotype($config, $subject_list){
 		  mkdir($target_folder);
 	 }
 	 $finfo=fopen($target_folder."marker_list","w+");
-	 $id=1;
+	 $gid=1;
 	 if ($config->verbose)
 		  printf("Start generating genotype folder\n");
 	 
@@ -86,38 +111,55 @@ function gex_init_genotype($config, $subject_list){
 		  if ($config->verbose)
 			   printf("Working on Chromosome ".$chr_list[$chr_id]."\n");
 
-		  $current_folder=$folder.$chr_list[$chr_id]."/";
+		  //create a folder for probability data of chromosome genotype
+          $current_folder=$folder.$chr_list[$chr_id]."/";
 		  if (!file_exists($current_folder)){
 			   mkdir($current_folder);
 		  }
-		  $files=array();
+
+          $files=array();
 		  $genotypes=array();
+          for ($i=0;$i < count($strain_name); $i++){
+			   if ($config->have_probability)
+                    $files[$i]=file($current_folder.$strain_name[$i].".txt.prob",$flag=FILE_IGNORE_NEW_LINES);
+			   $genotypes[$i]=fopen($current_folder.$strain_name[$i].".txt","r");
+               if (!$genotypes[$i]){
+                    debug_print_backtrace();
+                    die( " can not open file ". $strain_name[$i].".txt");
+               }
+		  }
+          if ($config->verbose){
+               printf("Loading position information ...\n");
+          }
 		  $markers=file($current_folder."Extra.txt");
-		  for ($i=0;$i < count($strain_name); $i++){
-			   if ($config->have_probability) $files[$i]=file($current_folder.$strain_name[$i].".txt.prob",$flag=FILE_IGNORE_NEW_LINES);
-			   $genotypes[$i]=file($current_folder.$strain_name[$i].".txt",$flag=FILE_IGNORE_NEW_LINES);
-		  }
-          /*
-		  if ($config->verbose){
-			   printf("dumping position information ...\n");
-		  }
-		  $positions=array();
-		  $fp=fopen($target_folder.$chr_list[$chr_id].".position","w+");
-		  foreach ($markers as $value){
-			   $info=split(',',$value);
-			   array_push($positions, $info[2]);
-		  }
-          */
+          $positions=array();
+          foreach ($markers as $value){
+               $info=split(',',$value);
+               array_push($positions, $info[2]);
+          }
 		  if ($config->verbose)
 			   printf("dumping genotype data .. \n");
 		  $fg=fopen($target_folder.$chr_list[$chr_id].".genotype","w+");
-		  for ($i=1;$i <count($genotypes[0]); $i++){
-			   for ($j=0; $j<count($genotypes);$j++){
-					fprintf($fg,"%s\t", $genotypes[$j][$i]);
+          $id=1;
+          while(!feof($genotypes[0])){
+               for ($j=0; $j<count($genotypes);$j++){
+                    if (fscanf($genotypes[$j],"%s",$temp)==0) break;
+					fprintf($fg,"%s\t", $temp);
 			   }
-			   fprintf($fg,"\n");
-		  }
+               if (!$config->have_probability){
+                    printf("%d\t%d\n", $positions[$id-1], $id);
+                    fprintf($finfo,"%d\t%s\t%d\t%d\n", $gid, $chr_list[$chr_id],$positions[$id-1], $id);
+                    $id++; $gid++;
+               }
+               
+               if (feof($genotypes[0])) break;
+               fprintf($fg,"\n");
+               
+          }
 		  fclose($fg);
+          for ($i=0;$i<count($genotypes);$i++){
+               fclose($genotypes[$i]);
+          }
 		  if ($config->have_probability) {
 			   if ($config->verbose)
 					printf("dumping probability table .. \n");
@@ -139,7 +181,6 @@ function gex_init_genotype($config, $subject_list){
 					$fd=fopen($target_folder.floor(($id-1)/1000)."/".$id.".txt","w+");
 					fprintf($fd, $sd);
 					fclose($fd);
-					fprintf($finfo,"%d\t%s\t%d\t%d\n", $id, $chr_list[$chr_id],$positions[$i-1], $i);
 					$id++;
 			   }
 		  }
@@ -155,7 +196,6 @@ function gex_init_gene_expression($config, $subject_list){
 		  mkdir($gene_folder);
 	 }
 	 
-	 $gene_meta_idx=gex_load_gene_meta($config);
 
 	 //copy gene file to gene folder
 	 copy($config->gene_meta_file, $gene_folder."gene_info");
@@ -171,8 +211,8 @@ function gex_init_gene_expression($config, $subject_list){
 		  }
 		  $fd=fopen($currfolder."/".$value, 'w+');
 		  fprintf($finfo,"%s\t%s\n", $value, (int)($i/1000));
-		  foreach ($data_list as $k => $value){
-			   fprintf($fd, "%s\n",$value[$key]);
+		  foreach ($data_list as $k => $value2){
+			   fprintf($fd, "%s\n",$value2[$key]);
 		  }
 		  fclose($fd);
 		  $i++;
@@ -194,40 +234,57 @@ function gex_load_gene_expression($config, $specified_subject_list=NULL, $requir
 		  printf("Loading gene expression info\n");
 	 }
 
-	 $meta=file($config->gene_expression_file, $flag=FILE_IGNORE_NEW_LINES);
 	 $subject_idx=array();
 	 $subject_list=array();
 	 $data_list=array();
 	 $idx=1;
- 	 foreach ($meta as $key => $value){
-		  if ($key==0) {
-			   $gene_name_list=split("\t", $value);
-			   unset($gene_name_list[0]);
-			   /* build meta index */
-			   
-			   $gender=file($config->gene_expression_gender, $flag=FILE_IGNORE_NEW_LINES);
-			   $gene_gender_list=split("\t", $gender[0]);
-		  }
-		  else {
-			   if ($require_data) $gene_data=split("\t", $value);
-			   else $gene_data=split("\t",$value,2);
-			   if ($specified_subject_list==NULL || in_array($gene_data[0], $specified_subject_list)){
-					print($gene_gender_list[$idx]);
-					print($config->gene_gender);
-					if  ((!$config->gene_filter_gender || $config->gene_gender==$gene_gender_list[$idx])){
-						 array_push($subject_list, $gene_data[0]);
-						 if ($require_data){
-							  printf("individual ".$gene_data[0]." \n");
-							  for ($i=0;$i<count($gene_data);$i++) if ($gene_data[$i]=="") $gene_data[$i]="NA";
-							  $subject_idx[$gene_data[0]]=count($subject_list)-1;
-							  unset($gene_data[0]);
-							  array_push($data_list, $gene_data);
-						 }
-					}
-			   }
-		  }
-		  $idx++;
+	 //$meta=file($config->gene_expression_file, $flag=FILE_IGNORE_NEW_LINES);
+ 	 //foreach ($meta as $key => $value){
+     $gene_expression=fopen($config->gene_expression_file, "r");
+     $key=0;
+     if ($gene_expression){
+          while(($value=(fgets($gene_expression,10000000))) !== false) {
+               $value=trim($value);
+               if ($key==0) {
+                    $gene_name_list=split("\t", $value);
+                    unset($gene_name_list[0]);
+                    /* build gene_expression index */
+                    if ($config->gene_filter_gender) {
+                         $gender=file($config->gene_expression_gender, $flag=FILE_IGNORE_NEW_LINES);
+                         $gene_gender_list=split("\t", $gender[0]);
+                    }
+               }
+               else {
+                    if ($require_data) $gene_data=split("\t", $value);
+                    else $gene_data=split("\t",$value,2);
+                    // Check whether it is specified in list, otherwise, should be ignored
+                    if ($specified_subject_list==NULL || in_array($gene_data[0], $specified_subject_list)){
+                         // check whether match the gender information
+                         if  ((!$config->gene_filter_gender || $config->gene_gender==$gene_gender_list[$idx])){
+                              array_push($subject_list, $gene_data[0]);
+                              if ($require_data){
+                                   printf("individual ".$gene_data[0]." \n");
+                                   for ($i=0;$i<count($gene_data);$i++) if ($gene_data[$i]=="") $gene_data[$i]="NA";
+                                   $subject_idx[$gene_data[0]]=count($subject_list)-1;
+                                   unset($gene_data[0]);
+                                   array_push($data_list, $gene_data);
+                              }
+                         }
+                    }
+               }
+               $idx++;$key++;
+          }
+          if (!feof($gene_expression)) {
+               debug_print_backtrace();
+               die("Unexpected fgets fail\n");
+          }
+
 	 }
+     else {
+          debug_print_backtrace();
+          die("Can not open file ".$config->gene_expression_file);
+     }
+
 	 if ($config->verbose){
 		  printf("There are %d genes loaded \n", count($gene_name_list));
 	 }
