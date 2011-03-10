@@ -147,7 +147,7 @@ function gex_init_genotype($config, $subject_list){
 					fprintf($fg,"%s\t", $temp);
 			   }
                if (!$config->have_probability){
-                    printf("%d\t%d\n", $positions[$id-1], $id);
+                    //printf("%d\t%d\n", $positions[$id-1], $id);
                     fprintf($finfo,"%d\t%s\t%d\t%d\n", $gid, $chr_list[$chr_id],$positions[$id-1], $id);
                     $id++; $gid++;
                }
