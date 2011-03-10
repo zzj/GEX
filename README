@@ -1,0 +1,76 @@
+* Checkout the code:
+ svn co http://compgen.unc.edu/svn/gamli/src/gex/
+
+* Update the code :
+ svn update
+
+* Install nessecary packages:
+
+sudo apt-get install gfortran
+
+R
+
+install.packages(c('lars','gap','matlab','abind'))
+
+Verification:
+
+Please run "library()" in R to make sure these three libraries installed in your home directory instead of /usr/lib. The reason is we need to run it on our grid server. Home directory is shared by all servers on grid, but /usr/lib is your local binary folder, which is invisible on other servers. It means if you didn't install them in your home directory, you will receive package missed error when you submit it to grid server. 
+
+ 
+* Input data format:
+
+genotype folder:
+[1] A file named "strain_list", each line is a subject name.
+[2] A list of folders, with the number of chromosome id.
+    [a] In the folder, each subject has  a file named by the subject name. For example, for subject "a", there is a file of "a.txt". It stores the converted genotype data for corresponding chromosome (0 for major homozygous site, 2 for minor homozygous site, 1 for heterozygous site, N for unknown), each line is a character representing the site. Each line's meta information should be stored in corresponding line of Extra.txt file. 
+	[b] there is file named "Extra.txt", which is standard csv file having at least three columns. The first column is markers' id, the second column is chr id, the third column is position.
+
+	For an analysis with both genotype data and methylation measurement, you can also treat it as a marker. Therefore, in subject genotype file, there will be float numbers to represent methylation measurement.
+
+gene expression file:
+Standard csv file, use '\t' as a delimiter.  Take a look at /home/zzj/Research/gamli/data/gene_expression/precc_liver_expression/liver_exp_pheno.txt . If there is missing entry, just leave an empty entry there. 
+
+gene meta file:
+Standard csv file. Take a look at "/home/zzj/Research/gamli/data/gene_expression/mouse_gene_meta/gene_meta.txt"
+
+Configuration file:
+
+config.json
+init:
+		"actions" : "init",
+
+lasso_analysis		
+		"actions" : "lasso_analysis",
+
+lasso_plot
+        "actions" : "lasso_plot"
+
+Run it:
+
+php gex.php config.json
+
+If everything goes fine, it will generate a file named command_list,
+Copy and paste the first line in command_list into your console command, and run it. The last parameter in the command is the output file, typically with a suffix "Rout",
+open that file, check whether there is some error in the file. If it runs correctly, you can see something like:
+
+> proc.time()
+   user  system elapsed 
+ 80.040   0.150  80.812 
+
+ at the end of the output file.
+
+
+then use
+
+  qsub test.sh
+
+to run it on the grid server. Before this, make sure the last number of second line in test.sh is the number of lines in your command_list file.
+
+Or use bash command_list to run it only on your machine. 
+
+
+
+    
+
+
+
