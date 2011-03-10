@@ -18,7 +18,7 @@
 		"have_probability" : 0,
 		"verbose" : 1,
 		"command_list": "command_list",
-		"actions" : "init",
+		"actions" : "lasso_analysis",
 
 		"kinship_result_folder" : "kinship",
 		"emma_result_folder" : "emma",
