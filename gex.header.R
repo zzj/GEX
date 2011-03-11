@@ -49,7 +49,6 @@ for ( i in a:b){
 }
 
 
-
 gex.mhtplot <- function(markers,chrid,genestart,geneend,ps,phenotypename,logscale=TRUE){
   mydata=(as.matrix(cbind(as.integer(markers[,2]),as.integer(markers[,3]),as.numeric(ps))))
   selected=which((markers[,3]>=genestart) & (markers[,3]<=geneend) & (markers[,2]==chrid))
@@ -74,3 +73,4 @@ gex.mhtplot <- function(markers,chrid,genestart,geneend,ps,phenotypename,logscal
   axis(2,pos=2,at=1:16)
   title(paste("Manhattan plot with gene highlighted","chr=",chrid,"genepos=",genestart),cex.main=1.8)
 }
+
