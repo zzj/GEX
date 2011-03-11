@@ -3,6 +3,5 @@
 #$ -o /home/zzj/temp
 #$ -j y
 #$ -q all.q
-
-cd ~/Research/gex
+#$ -cwd
 php  test.php gse13870.json $SGE_TASK_ID
