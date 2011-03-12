@@ -235,7 +235,7 @@ function gex_init_gene_expression($config, $subject_list){
 					mkdir($currfolder);
 		  }
           $fd=fopen($currfolder."/".$key, 'w+');
-		  fprintf($finfo,"%s\t%s\n", $key, (int)($i/1000));
+		  fprintf($finfo,"%s\t%s$s\t%s\t%s\n", $key, (int)($i/1000), $value[0], $value[1],$value[2]);
 		  foreach ($data_list as $k => $value2){
                if (!isset($value2[$gene_list[$key]])){
                     print($k);

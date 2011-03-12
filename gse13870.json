@@ -24,5 +24,6 @@
 		"emma_result_folder" : "emma",
 		"variance_result_folder" : "variance",
 		"std_result_folder" : "std",
-		"lasso_result_folder" : "lasso"
+		"lasso_result_folder" : "lasso",
+        "summary_result_folder" : "summary"
 }
