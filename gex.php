@@ -6,6 +6,7 @@ include_once("gex_variance.php");
 include_once("gex_emma.php");	 
 include_once("gex_std.php");	 
 include_once("gex_lasso.php");	 
+include_once("gex_summary.php");	 
 if (!isset($argv[1])){
 	 $config_file="config.json";
 }
@@ -37,6 +38,8 @@ foreach($actions as $action){
 		  gex_lasso_analysis($config);
 	 else if ($action=='lasso_plot')
 		  gex_lasso_plot($config);
+	 else if ($action=='summary')
+		  gex_summary($config);
 	 else die('unknown action '.$action."\n");
 }
 
