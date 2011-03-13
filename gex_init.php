@@ -160,6 +160,7 @@ function gex_init_genotype($config, $subject_list){
 			   printf("dumping genotype data .. \n");
 		  $fg=fopen($target_folder.$chr_list[$chr_id].".genotype","w+");
           $id=1;
+          $pos_idx=0;
           while(!feof($genotypes[0])){
                $out="";
                
@@ -170,12 +171,13 @@ function gex_init_genotype($config, $subject_list){
                     if ($temp=="N") {$out="ignore";break;}
                          
 			   }
+               $pos_idx++;
                if (feof($genotypes[0])) break;
-               if ( $out=="ignore") continue;
+               if ( $out=="ignore") {continue;}
                fprintf($fg,$out."\n");
                if (!$config->have_probability){
                     //printf("%d\t%d\n", $positions[$id-1], $id);
-                    fprintf($finfo,"%d\t%s\t%d\t%d\n", $gid, $chr_list[$chr_id],$positions[$id-1], $id);
+                    fprintf($finfo,"%d\t%s\t%d\t%d\n", $gid, $chr_list[$chr_id],$positions[$pos_idx-1], $id);
                     $id++; $gid++;
                }
           }
@@ -235,7 +237,7 @@ function gex_init_gene_expression($config, $subject_list){
 					mkdir($currfolder);
 		  }
           $fd=fopen($currfolder."/".$key, 'w+');
-		  fprintf($finfo,"%s\t%s$s\t%s\t%s\n", $key, (int)($i/1000), $value[0], $value[1],$value[2]);
+		  fprintf($finfo,"%s\t%s\t%s\t%s\t%s\n", $key, (int)($i/1000), $value[0], $value[1],$value[2]);
 		  foreach ($data_list as $k => $value2){
                if (!isset($value2[$gene_list[$key]])){
                     print($k);
