@@ -18,11 +18,12 @@
 		"have_probability" : 0,
 		"verbose" : 1,
 		"command_list": "command_list",
-		"actions" : "init",
+		"actions" : "std_analysis",
 
 		"kinship_result_folder" : "kinship",
 		"emma_result_folder" : "emma",
 		"variance_result_folder" : "variance",
 		"std_result_folder" : "std",
-		"lasso_result_folder" : "lasso"
+		"lasso_result_folder" : "lasso",
+        "summary_result_folder" : "summary"
 }

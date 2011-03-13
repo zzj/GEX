@@ -18,6 +18,14 @@ function gex_get_emma_folder($config){
 	 return $folder;
 }
 
+function gex_get_summary_folder($config){
+	 $folder=gex_get_project_result_folder($config).$config->summary_result_folder."/";
+	 if (!file_exists($folder)){
+		  mkdir($folder);
+	 }
+	 return $folder;
+}
+
 function gex_get_variance_folder($config){
 
 	 $folder=gex_get_project_result_folder($config).$config->variance_result_folder."/";
