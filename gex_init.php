@@ -167,10 +167,10 @@ function gex_init_genotype($config, $subject_list){
                for ($j=0; $j<count($genotypes);$j++){
                     if (fscanf($genotypes[$j],"%s",$temp)==0) break;
 					$out.=$temp."\t";
-
-                    if ($temp=="N") {$out="ignore";break;}
-                         
+                    # must use continue, because other genotype file handles does not reach the same position
+                    if ($temp=="N") {$out="ignore";continue;}
 			   }
+
                $pos_idx++;
                if (feof($genotypes[0])) break;
                if ( $out=="ignore") {continue;}
