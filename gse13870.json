@@ -18,7 +18,7 @@
 		"have_probability" : 0,
 		"verbose" : 1,
 		"command_list": "command_list",
-		"actions" : "kinship_analysis",
+		"actions" : "variance_global_opt_analysis",
 
 		"kinship_result_folder" : "kinship",
 		"emma_result_folder" : "emma",
