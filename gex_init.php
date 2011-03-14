@@ -163,17 +163,18 @@ function gex_init_genotype($config, $subject_list){
           $pos_idx=0;
           while(!feof($genotypes[0])){
                $out="";
+               $ignore=false;
                
                for ($j=0; $j<count($genotypes);$j++){
                     if (fscanf($genotypes[$j],"%s",$temp)==0) break;
 					$out.=$temp."\t";
                     # must use continue, because other genotype file handles does not reach the same position
-                    if ($temp=="N") {$out="ignore";continue;}
+                    if ($temp=="N") {$ignore=true;continue;}
 			   }
 
                $pos_idx++;
                if (feof($genotypes[0])) break;
-               if ( $out=="ignore") {continue;}
+               if ( $ignore) {continue;}
                fprintf($fg,$out."\n");
                if (!$config->have_probability){
                     //printf("%d\t%d\n", $positions[$id-1], $id);

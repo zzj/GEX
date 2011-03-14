@@ -18,6 +18,7 @@ $config=json_decode(file_get_contents($config_file));
 if ($config==NULL) die("Can not parse ". $config_file);
 echo " Start initializing Project $config->project_name ...\n" ;
 
+if (isset($argv[2])){ $actions=$argv[2];}
 $actions=split(',', $config->actions);
 foreach($actions as $action){
 	 if ($action=='init')
