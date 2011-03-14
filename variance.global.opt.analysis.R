@@ -1,5 +1,6 @@
 ##First read in the arguments listed at the command line
 args=(commandArgs(TRUE))
+options(scipen=4)
 library(emma)
 library('DEoptim')
 source('lib/imageplot.R')
@@ -24,8 +25,9 @@ if(length(args)==0){
   rangeend=112949064
   phenotypename="ENSMUSG00000000001"
   phenotypefile="result/precc_liver_gene_expression/gene_expression/0/ENSMUSG00000000001"
+  step=10000000
   datafolder="result/precc_liver_gene_expression/emma/0/"
-
+  kinshipfolder="result/gse13870_female/kinship/local_10000000/local.kinships.Rdata"
   ##supply default values
 }else{
   for(i in 1:length(args)){
@@ -34,21 +36,11 @@ if(length(args)==0){
 }
 
 
-Y=data.matrix(read.table(phenotypefile))
-Y
-                                        # 10000000 249
-step=10000000
-size=249
-markers=data.matrix(read.table(paste(genotypefolder,'marker_list',sep="")))
-x=data.matrix(read.table(paste(genotypefolder,1,'.genotype',sep=""),na.string='N'))
-nk <- ncol(x)
-idx <- 2
-
 density.sigma <- function(x){
   currentcomp=K[current,,]
   Omega=x*currentcomp+R
 #  print(Omega)
-  t <- -(-nk/2*log(2*pi)-(det(Omega,T))/2-t(currentY) %*% solve(Omega) %*% currentY/2)
+  t <- -(-size/2*log(2*pi)-(det(Omega,T))/2-t(currentY) %*% solve(Omega) %*% currentY/2)
   if (is.infinite(t)){
     print(Omega)
     print(t)
@@ -66,7 +58,7 @@ density.sigma.all <- function(sigma){
   }
   lastsigma <- sigma
   if (sum(sigma)==0) return (Inf)
-  t <- -(-nk/2*log(2*pi)-(log(det(Omega)))/2-t(currentY) %*% solve(Omega) %*% currentY/2 )
+  t <- -(-size/2*log(2*pi)-(log(det(Omega)))/2-t(currentY) %*% solve(Omega) %*% currentY/2 )
   if (is.infinite(t)){
     return (Inf)
   }
@@ -93,12 +85,21 @@ density.sigma.batch <- function(x){
   exp(sapply(x,density.sigma))
 }
 
+Y=data.matrix(read.table(phenotypefile))
+is.known=(!is.na(Y))
+Y <- Y[is.known]
+Y <- Y*100
+size=length(Y)
+markers=data.matrix(read.table(paste(genotypefolder,'marker_list',sep="")))
+x=data.matrix(read.table(paste(genotypefolder,1,'.genotype',sep=""),na.string='N'))
 cauchy.p <- 10
-load('variance.10M.kinship.Rdata')
+load(paste(kinshipfolder,'/local_',step,'/local.kinships.Rdata',sep=""))
+K <- K[,is.known, is.known]
+idx <- dim(K)[1]
 sigma <- array(0.00,dim=c(idx))
 sigma[idx] <- var(Y)
 # calculate total variance covariance matrix
-TotalVariance<-array(0,dim=c(nk,nk))
+TotalVariance<-array(0,dim=c(size,size))
 for (k in 1:idx){
   TotalVariance<-TotalVariance + sigma[k]*K[k,,]
 }
@@ -110,6 +111,7 @@ currentY <- Y-mean(Y)
 lower <- array(0,c(idx))
 upper <- array(var(Y)*3,c(idx))
 optresult <- nlminb(sigma, density.sigma.all, density.sigma.all.grad, lower=lower)
+print(optresult)
 result <- optresult$par
 save(chrid, genestart,result, optresult,file=paste(datafolder,phenotypename,"_global_nlminb.Rdata",sep=""))
 

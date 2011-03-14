@@ -1,5 +1,6 @@
 ##First read in the arguments listed at the command line
 args=(commandArgs(TRUE))
+library('multicore')
 library(emma)
 source('lib/imageplot.R')
 source('lib/slice.R')
@@ -63,7 +64,7 @@ for (i in 1:dim(names)[1]){
 }
 
 
-gex.plot.eqtl <- function(filelist,resultfolder,resultfilename,qtlresultfun,totalinterval,groups){
+gex.prepare.plot.eqtl <- function(filelist,qtlresultfun,totalinterval,groups){
   mycolors <- jet.colors(16)
   Img <- mat.or.vec(length(filelist),totalinterval-1)
   for ( i in 1:length(filelist)){
@@ -72,11 +73,14 @@ gex.plot.eqtl <- function(filelist,resultfolder,resultfilename,qtlresultfun,tota
     t <- t/max(t)
     Img[i,]=t[]
   }
-  save(Img, file=paste(resultfilename,'.Rdata',sep=""))
-  pdf(paste(resultfilename,'.pdf',sep=""))
-  imagesc(Img*16, xlab = "pos", ylab = "gene", col = mycolors )
-  dev.off()
+  Img
 }
-gex.plot.eqtl(lassofilelist,resultfolder,'eqlt_lasso',lasso.qtl.result,idx,groups)
+
+resultfilename <- 'eqtl_lasso'
+Img <- pvec(lassofilelist, gex.prepare.plot.eqtl,lasso.qtl.result,idx,groups)
+save(Img, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
+pdf(paste(resultfolder,'/',resultfilename,'.pdf',sep=""))
+imagesc(Img*16, xlab = "pos", ylab = "gene", col = mycolors )
+dev.off()
 
 
