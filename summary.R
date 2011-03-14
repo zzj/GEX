@@ -78,8 +78,8 @@ gex.prepare.plot.eqtl <- function(filelist,qtlresultfun,totalinterval,groups){
 
 resultfilename <- 'eqtl_lasso'
 Img <- pvec(lassofilelist, gex.prepare.plot.eqtl,lasso.qtl.result,idx,groups)
-save(Img, file=paste(resultfilename,'.Rdata',sep=""))
-pdf(paste(resultfilename,'.pdf',sep=""))
+save(Img, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
+pdf(paste(resultfolder,'/',resultfilename,'.pdf',sep=""))
 imagesc(Img*16, xlab = "pos", ylab = "gene", col = mycolors )
 dev.off()
 
