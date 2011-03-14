@@ -52,11 +52,11 @@ gex.build.kinship.by.region <- function(genotypefolder, datafolder,a,b,step){
   idx <- 1
   size <- 1
   markers=data.matrix(read.table(paste(genotypefolder,'marker_list',sep="")))
-  K<-array(0,dim=c(size,ncol(x), ncol(x)))
-  datafolder <- file.path(datafolder, "local_1M")
+  datafolder <- file.path(datafolder, paste("local",step,sep="_"))
   print(datafolder)
   dir.create(datafolder,showWarnings=F)
   zlim=c(0.3,1)
+  nk <- 1
   for ( i in a:b){
     print(i)
     x=data.matrix(read.table(paste(genotypefolder,i,'.genotype',sep=""),na.string='N'))
@@ -72,6 +72,7 @@ gex.build.kinship.by.region <- function(genotypefolder, datafolder,a,b,step){
       if (length(selected)>0){
         XX=X[selected,]
         tempK <- array(0,dim=c(1,ncol(x), ncol(x)))
+        nk <- ncol(x)
         tempK[1,,]=emma.kinship(XX)
         if (idx==1){
           K=tempK
@@ -91,14 +92,14 @@ gex.build.kinship.by.region <- function(genotypefolder, datafolder,a,b,step){
       minpos <- minpos+step
     }
   }
-  cbind(K,diag(nk))
+  K=abind(K,diag(nk),along=1)
   K.chr <- append(K.chr, -1)
   K.startpo <- append(K.startpos, -1)
   K.num <- append(K.num, -1)
   print(K.num)
-  save(K,file=paste(datafolder,"local.kinships.Rdata",sep=""))
+  save(K,file=paste(datafolder,"/local.kinships.Rdata",sep=""))
 }
   
 #gex.build.kinship(genotypefolder,datafolder,a,b);
-gex.build.kinship.by.region(genotypefolder, datafolder,a,b,1000000)
+gex.build.kinship.by.region(genotypefolder, datafolder,a,b,step)
 

@@ -30,6 +30,8 @@ foreach($actions as $action){
 		  gex_variance_analysis($config);
 	 else if ($action=='variance_local_opt_analysis')
 		  gex_variance_local_opt_analysis($config);
+	 else if ($action=='variance_global_opt_analysis')
+		  gex_variance_global_opt_analysis($config);
 	 else if ($action=='std_analysis')
 		  gex_std_analysis($config);
 	 else if ($action=='std_plot')

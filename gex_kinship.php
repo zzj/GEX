@@ -3,9 +3,13 @@
 include_once('gex_info.php');
 
 function gex_kinship_analysis($config){
-	$command=("R CMD BATCH --no-save --no-restore '--args a=1 b=19 genotypefolder=\"".gex_get_genotype_folder($config)."\" datafolder=\"".gex_get_kinship_folder($config).'"' ."' kinship.analysis.R kinship.analysis.Rout ");
-    printf($command."\n");
-    system($command);
+     $string=gex_r_command($config);
+     $string=gex_r_append_parameter($string,'datafolder',gex_get_kinship_folder($config));
+     $string=gex_r_append_parameter($string,'root',gex_get_project_result_folder($config));
+     $string=gex_r_append_parameter($string,'step',10000000);
+     $string=gex_r_command_end($string,'kinship.analysis.R');
+     printf($string."\n");
+     system($string);
 }
 
 
