@@ -80,11 +80,12 @@ function gex_variance_global_opt_analysis($config){
 		  gex_check_folder($resultfolder);
 		  $string=gex_r_append_parameter($string,'datafolder',$resultfolder);
           $string=gex_r_append_parameter($string,'kinshipfolder',gex_get_kinship_folder($config));
-          $string=gex_r_append_parameter($string,'step',10000000);
+          $string=gex_r_append_parameter($string,'step',$config->kinship_region_size);
 		  $string=gex_r_command_end($string,'variance.global.opt.analysis.R');
 		  fprintf($fd,$string."\n");
 	 }
 	 fclose($fd);
+     system('qsub test.sh');
 }
 
 

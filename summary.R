@@ -35,7 +35,7 @@ for ( i in 1:19){
   maxpos=max(markers[markers[,2]==i,3])
   while(minpos<maxpos){
     selected=which((markers[,3]>=minpos) & (markers[,3]<minpos+step) & (markers[,2]==i))
-    if (length(selected)!=0){
+    if (length(selected)>10){
       groups[selected] <- idx
       idx <- idx+1
     }
@@ -61,24 +61,33 @@ for (i in 1:dim(names)[1]){
   if (file.exists(filename)){
     lassofilelist <- c(lassofilelist,filename)
   }    
+  filename=paste(root,'/variance/',names[i,2],'/',names[i,1],'_global_nlminb.Rdata',sep='')
+  if (file.exists(filename)){
+    variancefilelist <- c(variancefilelist,filename)
+  }
 }
 
 
 gex.prepare.plot.eqtl <- function(filelist,qtlresultfun,totalinterval,groups){
-  mycolors <- jet.colors(16)
   Img <- mat.or.vec(length(filelist),totalinterval-1)
   for ( i in 1:length(filelist)){
     result <- qtlresultfun(filelist[i])
-    t <- ((as.numeric(tapply(result,groups,max))))
-    t <- t/max(t)
+    if (is.null(groups)) t <- result
+    else t <- ((as.numeric(tapply(result,groups,max))))
+    if (max(t)!=0)
+      t <- t/max(t)
     Img[i,]=t[]
   }
   Img
 }
 
-resultfilename <- 'eqtl_lasso'
-Img <- pvec(lassofilelist, gex.prepare.plot.eqtl,lasso.qtl.result,idx,groups)
+resultfilename <- 'eqtl_variance'
+#Img <- pvec(variancefilelist, gex.prepare.plot.eqtl,variance.qtl.result,idx ,NULL)
+Img <- gex.prepare.plot.eqtl(variancefilelist,variance.qtl.result,idx,NULL)
+print(Img)
+
 save(Img, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
+mycolors <- jet.colors(16)
 pdf(paste(resultfolder,'/',resultfilename,'.pdf',sep=""))
 imagesc(Img*16, xlab = "pos", ylab = "gene", col = mycolors )
 dev.off()
