@@ -91,7 +91,6 @@ Y <- Y[is.known]
 Y <- Y*100
 size=length(Y)
 markers=data.matrix(read.table(paste(genotypefolder,'marker_list',sep="")))
-x=data.matrix(read.table(paste(genotypefolder,1,'.genotype',sep=""),na.string='N'))
 cauchy.p <- 10
 load(paste(kinshipfolder,'/local_',step,'/local.kinships.Rdata',sep=""))
 K <- K[,is.known, is.known]
