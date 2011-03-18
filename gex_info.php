@@ -119,7 +119,7 @@ function gex_r_append_parameter($string, $name, $value){
 }
 
 function gex_r_command($config){
-	 $command= "R CMD BATCH --no-save --no-restore '--args a=1 b=19 genotypefolder=\"".gex_get_genotype_folder($config)."\" kinshipfolder=\"".gex_get_kinship_folder($config).'"';
+	 $command= "R CMD BATCH --no-save --no-restore '--args a=1 b=100 genotypefolder=\"".gex_get_genotype_folder($config)."\" kinshipfolder=\"".gex_get_kinship_folder($config).'"';
 	 return $command;
 }
 

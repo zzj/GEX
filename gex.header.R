@@ -35,16 +35,18 @@ chrgenotypes <- vector("list",b-a+1)
 Y=data.matrix(read.table(phenotypefile))
 markers=data.matrix(read.table(paste(genotypefolder,'marker_list',sep="")))
 for ( i in a:b){
-  x=data.matrix(read.table(paste(genotypefolder,i,'.genotype',sep=""),na.string='N'))
-  x=x/2
-  if (i==a){
-    X=x
-  } else{
-    X=rbind(X,x)
-  }
-  chrgenotypes[[i-a+1]]=x
-  if (chrid==i){
-    chrg <- x
+  if (file.exists(paste(genotypefolder,i,'.genotype',sep=""))){
+    x=data.matrix(read.table(paste(genotypefolder,i,'.genotype',sep=""),na.string='N'))
+    x=x/2
+    if (i==a){
+      X=x
+    } else{
+      X=rbind(X,x)
+    }
+    chrgenotypes[[i-a+1]]=x
+    if (chrid==i){
+      chrg <- x
+    }
   }
 }
 
