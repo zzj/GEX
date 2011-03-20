@@ -165,6 +165,8 @@ function gex_r_analysis($config, $resultfolder, $r_file, $r_fun=NULL){
 		  $resultfolder2=$resultfolder.$gene_idx[$key].'/';
 		  gex_check_folder($resultfolder2);
 		  $string=gex_r_append_parameter($string,'datafolder',$resultfolder2);
+          $string=gex_r_append_parameter($string,'kinshipfolder',gex_get_kinship_folder($config));
+          $string=gex_r_append_parameter($string,'step',$config->kinship_region_size);
 		  $string=gex_r_command_end($string,$r_file);
 		  fprintf($fd,$string."\n");
 	 }
