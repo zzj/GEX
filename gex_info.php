@@ -147,9 +147,19 @@ function gex_r_analysis($config, $resultfolder, $r_file, $r_fun=NULL){
 	 $meta_idx=gex_load_gene_meta($config);
 	 $gene_idx=gex_load_gene_expression_file_info($config);
 	 $fd=fopen($config->command_list,"w+");
+     $skip=$config->rough_scan;
+     
 	 foreach ($gene_idx as $key => $valuep){
 		  if (!isset($meta_idx[$key]))
 			   continue;
+          if ($skip==0) {
+               $skip=$config->rough_scan;
+          }
+          else {
+               $skip--;
+               continue;
+          }
+          
 		  $value=$meta_idx[$key];
 		  $string=gex_r_command($config);
 		  $string=gex_r_append_parameter($string,'chrid',(int)$value[0]);
@@ -165,6 +175,8 @@ function gex_r_analysis($config, $resultfolder, $r_file, $r_fun=NULL){
 		  $resultfolder2=$resultfolder.$gene_idx[$key].'/';
 		  gex_check_folder($resultfolder2);
 		  $string=gex_r_append_parameter($string,'datafolder',$resultfolder2);
+          $string=gex_r_append_parameter($string,'kinshipfolder',gex_get_kinship_folder($config));
+          $string=gex_r_append_parameter($string,'step',$config->kinship_region_size);
 		  $string=gex_r_command_end($string,$r_file);
 		  fprintf($fd,$string."\n");
 	 }
