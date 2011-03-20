@@ -81,15 +81,21 @@ gex.prepare.plot.eqtl <- function(filelist,qtlresultfun,totalinterval,groups){
   Img
 }
 
-resultfilename <- 'eqtl_variance'
-#Img <- pvec(variancefilelist, gex.prepare.plot.eqtl,variance.qtl.result,idx ,NULL)
-Img <- gex.prepare.plot.eqtl(variancefilelist,variance.qtl.result,idx,NULL)
-print(Img)
-
-save(Img, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
-mycolors <- jet.colors(16)
-pdf(paste(resultfolder,'/',resultfilename,'.pdf',sep=""))
-imagesc(Img*16, xlab = "pos", ylab = "gene", col = mycolors )
-dev.off()
-
+if (fun=='variance') {
+  resultfilename <- 'eqtl_variance'
+  Img <- gex.prepare.plot.eqtl(variancefilelist,variance.qtl.result,idx,NULL)
+  save(Img, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
+  mycolors <- jet.colors(16)
+  pdf(paste(resultfolder,'/',resultfilename,'.pdf',sep=""))
+  imagesc(Img*16, xlab = "pos", ylab = "gene", col = mycolors )
+  dev.off()
+}else  if (fun=='lasso') {
+  resultfilename <- 'eqtl_lasso'
+  Img <- gex.prepare.plot.eqtl(lassofilelist,lasso.qtl.result,idx,groups)
+  save(Img, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
+  mycolors <- jet.colors(16)
+  pdf(paste(resultfolder,'/',resultfilename,'.pdf',sep=""))
+  imagesc(Img*16, xlab = "pos", ylab = "gene", col = mycolors )
+  dev.off()
+}
 

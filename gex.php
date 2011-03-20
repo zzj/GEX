@@ -41,8 +41,8 @@ foreach($actions as $action){
 		  gex_lasso_analysis($config);
 	 else if ($action=='lasso_plot')
 		  gex_lasso_plot($config);
-	 else if ($action=='summary')
-		  gex_summary($config);
+	 else if (substr($action,-7)=='summary')
+		  gex_summary($config, substr($action, 0, -8));
 	 else die('unknown action '.$action."\n");
 }
 
