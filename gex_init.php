@@ -176,7 +176,7 @@ function gex_init_genotype($config, $subject_list){
                          if ($last!=$temp) $same=false;
                     }
                     # must use continue, because other genotype file handles does not reach the same position
-                    if ($temp=="N") {$ignore=true;continue;}
+                    if ($temp=="N") {$ignore=true;}
 			   }
                if ($same) $ignore=true;
                

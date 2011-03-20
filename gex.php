@@ -14,9 +14,18 @@ else {
 	 $config_file=$argv[1];
 }
 
+
 $config=json_decode(file_get_contents($config_file));
+
 if ($config==NULL) die("Can not parse ". $config_file);
 echo " Start initializing Project $config->project_name ...\n" ;
+$config->emma_result_folder="emma";
+$config->variance_result_folder="variance";
+$config->std_result_folder="std";
+$config->lasso_result_folder="lasso";
+$config->summary_result_folder="summary";
+$config->kinship_result_folder="kinship";
+
 
 $actions=split(',', $config->actions);
 if (isset($argv[2])){ $actions=split(',',$argv[2]);}
@@ -41,8 +50,8 @@ foreach($actions as $action){
 		  gex_lasso_analysis($config);
 	 else if ($action=='lasso_plot')
 		  gex_lasso_plot($config);
-	 else if ($action=='summary')
-		  gex_summary($config);
+	 else if (substr($action,-7)=='summary')
+		  gex_summary($config, substr($action, 0, -8));
 	 else die('unknown action '.$action."\n");
 }
 

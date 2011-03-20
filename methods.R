@@ -19,7 +19,13 @@ lasso.plot <- function(datafolder, phenotypename, markers,chrid,genestart,geneen
 lasso.qtl.result <- function(filename){
   load(file=filename)
   a=abs(object3$beta[dim(object3$beta[,])[1]-1,])
+  
   return(a)
+}
+
+variance.qtl.result <- function(filename){
+  load(file=filename)
+  return (optresult$par[-length(optresult$par)])
 }
 
 

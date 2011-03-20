@@ -69,7 +69,7 @@ gex.build.kinship.by.region <- function(genotypefolder, datafolder,a,b,step){
     
     while(minpos<maxpos){
       selected=which((markers[,3]>=minpos) & (markers[,3]<minpos+step) & (markers[,2]==i))
-      if (length(selected)>0){
+      if (length(selected)>10){
         XX=X[selected,]
         tempK <- array(0,dim=c(1,ncol(x), ncol(x)))
         nk <- ncol(x)
