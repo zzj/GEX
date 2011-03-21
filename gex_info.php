@@ -123,8 +123,10 @@ function gex_r_command($config){
 	 return $command;
 }
 
-function gex_r_command_end($string,$file){
-	 $string=$string."'  $file "." $file"."out";
+function gex_r_command_end($string,$file,$output=NULL){
+	 if ($output==NULL)
+          $string=$string."'  $file "." $file"."out";
+     else $string=$string."' $file $output";
  	 return $string;
 }
 
