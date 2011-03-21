@@ -11,6 +11,7 @@ function gex_summary($config, $type){
      $string=gex_r_append_parameter($string,'resultfolder',$summaryfolder);
      $string=gex_r_append_parameter($string,'geneexpfolder',$geneexpfolder);
      $string=gex_r_append_parameter($string,'fun',$type);
+     $string=gex_r_append_parameter($string,'step', $config->kinship_region_size);
      $string=gex_r_append_parameter($string,'root',gex_get_project_result_folder($config));
      $string=gex_r_command_end($string,'summary.R','/dev/tty');
      printf($string."\n");
