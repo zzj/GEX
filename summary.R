@@ -28,7 +28,6 @@ if(length(args)==0){
 
 markers <- data.matrix(read.table(paste(genotypefolder,'marker_list',sep="")))
 idx <- 1
-step=10000000
 groups <- rep(0,dim(markers)[1])
 for ( i in 1:19){
   minpos=min(markers[markers[,2]==i,3])
