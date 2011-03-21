@@ -195,6 +195,7 @@ function gex_init_genotype($config, $subject_list){
                fclose($genotypes[$i]);
           }
 		  if ($config->have_probability) {
+               $pos_idx=0;
 			   if ($config->verbose)
 					printf("dumping probability table .. \n");
 			   for ($i=1;$i < count($files[0]);$i++){
@@ -212,10 +213,13 @@ function gex_init_genotype($config, $subject_list){
 						 }
 						 $sd=$sd.sprintf("\n");
 					}
+
 					$fd=fopen($target_folder.floor(($id-1)/1000)."/".$id.".txt","w+");
 					fprintf($fd, $sd);
 					fclose($fd);
-					$id++;
+                    $pos_idx++;
+                    fprintf($finfo,"%d\t%s\t%d\t%d\t%d\n", $gid, $chr_list[$chr_id],$positions[$pos_idx-1], $id, floor(($id-1)/1000));
+                    $id++; $gid++;
 			   }
 		  }
 	 }
