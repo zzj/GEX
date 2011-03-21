@@ -51,7 +51,7 @@ emmafilelist <- c()
 variancefilelist <- c()
 lassofilelist <- c()
 
-names <- data.matrix(read.table(paste(geneexpfolder,"gene_list",sep="")))
+names <- (read.table(paste(geneexpfolder,"gene_list",sep="")))
 for (i in 1:dim(names)[1]){
   filename=paste(root,'/std/',names[i,2],'/',names[i,1],'.Rdata',sep='')
   if (file.exists(filename)){
@@ -69,21 +69,23 @@ for (i in 1:dim(names)[1]){
 
 
 gex.prepare.plot.eqtl <- function(filelist,qtlresultfun,totalinterval,groups){
-  Img <- mat.or.vec(length(filelist),totalinterval-1)
+  Img <- list()
   for ( i in 1:length(filelist)){
     result <- qtlresultfun(filelist[i])
-    if (is.null(groups)) t <- result
+    if (is.null(groups)) t <- result[]
     else t <- ((as.numeric(tapply(result,groups,max))))
     if (max(t)!=0)
       t <- t/max(t)
-    Img[i,]=t[]
+    Img[[i]] <- t
   }
-  Img
+  (Img)
 }
 
 if (fun=='variance') {
   resultfilename <- 'eqtl_variance'
-  Img <- gex.prepare.plot.eqtl(variancefilelist,variance.qtl.result,idx,NULL)
+  Img <- pvec((variancefilelist),gex.prepare.plot.eqtl,variance.qtl.result,idx,NULL)
+#  Img <- gex.prepare.plot.eqtl(variancefilelist, variance.qtl.result, idx,NULL)
+  Img <- do.call(rbind, Img)
   save(Img, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
   mycolors <- jet.colors(16)
   pdf(paste(resultfolder,'/',resultfilename,'.pdf',sep=""))
@@ -91,7 +93,17 @@ if (fun=='variance') {
   dev.off()
 }else  if (fun=='lasso') {
   resultfilename <- 'eqtl_lasso'
-  Img <- gex.prepare.plot.eqtl(lassofilelist,lasso.qtl.result,idx,groups)
+  Img <- pvec(lassofilelist,gex.prepare.plot.eqtl,lasso.qtl.result,idx,groups)
+  Img <- do.call(rbind, Img)
+  save(Img, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
+  mycolors <- jet.colors(16)
+  pdf(paste(resultfolder,'/',resultfilename,'.pdf',sep=""))
+  imagesc(Img*16, xlab = "pos", ylab = "gene", col = mycolors )
+  dev.off()
+} else  if (fun=='std') {
+  resultfilename <- 'eqtl_std'
+  Img <- pvec(stdfilelist,gex.prepare.plot.eqtl,std.qtl.result,idx,groups)
+  Img <- do.call(rbind, Img)
   save(Img, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
   mycolors <- jet.colors(16)
   pdf(paste(resultfolder,'/',resultfilename,'.pdf',sep=""))
