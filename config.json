@@ -1,7 +1,7 @@
 {
 		"project_name" : "Precc Liver Expression Analysis",
 		"gene_expression_file" : "/home/zzj/Research/gamli/data/gene_expression/precc_liver_expression/liver_exp_pheno.txt",
-		"gene_meta_file" : "/home/zzj/Research/gamli/data/gene_expression/mouse_gene_meta/gene_meta.txt",
+		"gene_meta_file" : "/home/zzj/Research/gamli/data/gene_expression/mouse_gene_meta/ensemble_probe_meta.txt",
 		"gene_meta_chr" : 3,
 		"gene_meta_start_position" : 4,
 		"gene_meta_end_position" : 5,
@@ -14,7 +14,7 @@
 		"genotype_chr_folder" : "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
 		"project_folder" : "result/",
 		"project_alias" : "precc_liver_gene_expression",
-		"have_probability" : 1,
+		"have_probability" : 0,
 		"verbose" : 1,
 		"command_list": "command_list",
 		"actions" : "kinship_analysis",

@@ -146,7 +146,7 @@ function gex_r_analysis($config, $resultfolder, $r_file, $r_fun=NULL){
 	 $geneexpfolder=gex_get_gene_expression_folder($config);
 	 $meta_idx=gex_load_gene_meta($config);
 	 $gene_idx=gex_load_gene_expression_file_info($config);
-	 $fd=fopen($config->command_list,"w+");
+	 $fd=fopen($config->command_list,"a");
      $skip=$config->rough_scan;
      
 	 foreach ($gene_idx as $key => $valuep){
@@ -159,8 +159,8 @@ function gex_r_analysis($config, $resultfolder, $r_file, $r_fun=NULL){
                $skip--;
                continue;
           }
-          
 		  $value=$meta_idx[$key];
+          if ((int)$value[0]==0) continue;
 		  $string=gex_r_command($config);
 		  $string=gex_r_append_parameter($string,'chrid',(int)$value[0]);
 		  $string=gex_r_append_parameter($string,'genestart',(int)$value[1]);
