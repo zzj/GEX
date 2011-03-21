@@ -40,7 +40,7 @@ density.sigma <- function(x){
   currentcomp=K[current,,]
   Omega=x*currentcomp+R
 #  print(Omega)
-  t <- -(-size/2*log(2*pi)-(det(Omega,T))/2-t(currentY) %*% solve(Omega) %*% currentY/2)
+  t <- -(-size/2*log(2*pi)-((determinant(Omega,logarithm=T)$modulus)/2-t(currentY) %*% solve(Omega) %*% currentY/2)
   if (is.infinite(t)){
     print(Omega)
     print(t)
@@ -49,7 +49,7 @@ density.sigma <- function(x){
   t
 }
 
-                                        # return density of sigma
+# return density of sigma
 density.sigma.all <- function(sigma){
 #  print(Omega)
   for (k in 1:idx){
@@ -58,7 +58,7 @@ density.sigma.all <- function(sigma){
   }
   lastsigma <- sigma
   if (sum(sigma)==0) return (Inf)
-  t <- -(-size/2*log(2*pi)-(log(det(Omega)))/2-t(currentY) %*% solve(Omega) %*% currentY/2 )
+  t <- -(-size/2*log(2*pi)-((determinant(Omega,logarithm=T))$modulus)/2-t(currentY) %*% solve(Omega) %*% currentY/2 )
   if (is.infinite(t)){
     return (Inf)
   }
@@ -72,7 +72,6 @@ density.sigma.all.grad <- function(sigma){
   }
   lastsigma <- sigma
   invOmega <- solve(Omega)
-  detOmega <- det(Omega)
   ret <- array(0,dim=c(idx))
   for (k in 1:(idx)){
     ret[k] <- sum(rowSums((invOmega)* (t(K[k,,]))))/2-t(currentY) %*% invOmega %*% K[k,,] %*% invOmega %*% currentY/2
@@ -89,13 +88,14 @@ Y=data.matrix(read.table(phenotypefile))
 is.known=(!is.na(Y))
 Y <- Y[is.known]
 Y <- Y*100
+Y <- Y-mean(Y)
 size=length(Y)
 markers=data.matrix(read.table(paste(genotypefolder,'marker_list',sep="")))
 cauchy.p <- 10
 load(paste(kinshipfolder,'/local_',step,'/local.kinships.Rdata',sep=""))
 K <- K[,is.known, is.known]
 idx <- dim(K)[1]
-sigma <- array(0.00,dim=c(idx))
+sigma <- array(0,dim=c(idx))
 sigma[idx] <- var(Y)
 # calculate total variance covariance matrix
 TotalVariance<-array(0,dim=c(size,size))
