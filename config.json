@@ -5,6 +5,11 @@
 		"gene_meta_chr" : 3,
 		"gene_meta_start_position" : 4,
 		"gene_meta_end_position" : 5,
+
+		"gene_expression_gender" : "",
+		"gene_filter_gender": 0,
+		"gene_gender":"F",
+        
         "genotype_folder" : "/home/zzj/Research/gamli/data/metabolism_result/",
 		"genotype_chr_folder" : "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
 		"project_folder" : "result/",
@@ -13,10 +18,7 @@
 		"verbose" : 1,
 		"command_list": "command_list",
 		"actions" : "kinship_analysis",
+        "kinship_region_size" : 10000000,
+        "rough_scan": 10
 
-		"kinship_result_folder" : "kinship",
-		"emma_result_folder" : "emma",
-		"variance_result_folder" : "variance",
-		"std_result_folder" : "std",
-		"lasso_result_folder" : "lasso"
 }
