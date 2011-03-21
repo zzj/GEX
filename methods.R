@@ -48,3 +48,7 @@ std.plot <- function(datafolder, phenotypename, markers,chrid,genestart,geneend)
   dev.off();
 }
 
+std.qtl.result <- function(filename){
+  load(file=filename)
+  return (-log(p))
+}

@@ -18,7 +18,7 @@
 		"verbose" : 1,
 		"command_list": "command_list",
 		"actions" : "kinship_analysis",
-        "kinship_region_size" : 10000000,
+        "kinship_region_size" : 5000000,
         "rough_scan": 10
 
 }
