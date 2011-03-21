@@ -29,6 +29,7 @@ $config->kinship_result_folder="kinship";
 
 $actions=split(',', $config->actions);
 if (isset($argv[2])){ $actions=split(',',$argv[2]);}
+system("rm ".$config->command_list);
 foreach($actions as $action){
 	 if ($action=='init')
 		  gex_init($config);

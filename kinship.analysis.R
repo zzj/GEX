@@ -59,37 +59,39 @@ gex.build.kinship.by.region <- function(genotypefolder, datafolder,a,b,step){
   nk <- 1
   for ( i in a:b){
     print(i)
-    x=data.matrix(read.table(paste(genotypefolder,i,'.genotype',sep=""),na.string='N'))
-    x=x/2
-    if (i==1)
-      X=x
-    else X=rbind(X,x)
-    minpos=min(markers[markers[,2]==i,3])
-    maxpos=max(markers[markers[,2]==i,3])
-    
-    while(minpos<maxpos){
-      selected=which((markers[,3]>=minpos) & (markers[,3]<minpos+step) & (markers[,2]==i))
-      if (length(selected)>10){
-        XX=X[selected,]
-        tempK <- array(0,dim=c(1,ncol(x), ncol(x)))
-        nk <- ncol(x)
-        tempK[1,,]=emma.kinship(XX)
-        if (idx==1){
-          K=tempK
-          K.chr=c(i)
-          K.startpos=c(minpos)
-          K.num=c(length(selected))
+    if (file.exists(paste(genotypefolder,i,'.genotype',sep=""))){
+      x=data.matrix(read.table(paste(genotypefolder,i,'.genotype',sep=""),na.string='N'))
+      x=x/2
+      if (i==1)
+        X=x
+      else X=rbind(X,x)
+      minpos=min(markers[markers[,2]==i,3])
+      maxpos=max(markers[markers[,2]==i,3])
+      
+      while(minpos<maxpos){
+        selected=which((markers[,3]>=minpos) & (markers[,3]<minpos+step) & (markers[,2]==i))
+        if (length(selected)>10){
+          XX=X[selected,]
+          tempK <- array(0,dim=c(1,ncol(x), ncol(x)))
+          nk <- ncol(x)
+          tempK[1,,]=emma.kinship(XX)
+          if (idx==1){
+            K=tempK
+            K.chr=c(i)
+            K.startpos=c(minpos)
+            K.num=c(length(selected))
+          }
+          else{
+            K=abind(K,tempK,along=1)
+            K.chr <- append(K.chr, i)
+            K.startpos <- append(K.startpos, minpos)
+            K.num <- append(K.num, length(selected))
+          }
+          gex.kinship.image(K[idx,,],datafolder,paste("chr_",i,"_local_",idx,"markers_",K.num[idx],sep=""),zlim)
+          idx <- idx+1
         }
-        else{
-          K=abind(K,tempK,along=1)
-          K.chr <- append(K.chr, i)
-          K.startpos <- append(K.startpos, minpos)
-          K.num <- append(K.num, length(selected))
-        }
-        gex.kinship.image(K[idx,,],datafolder,paste("chr_",i,"_local_",idx,"markers_",K.num[idx],sep=""),zlim)
-        idx <- idx+1
-      }
       minpos <- minpos+step
+      }
     }
   }
   K=abind(K,diag(nk),along=1)
