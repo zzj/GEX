@@ -46,7 +46,7 @@ density.sigma.all <- function(sigma){
   }
   lastsigma <- sigma
   if (sum(sigma)==0) return (Inf)
-  t <- -(-nk/2*log(2*pi)-(log(det(Omega)))/2-t(currentY) %*% solve(Omega) %*% currentY/2 )
+  t <- -(-nk/2*log(2*pi)-((determinant(Omega,logarithm=T)$modulus))/2-t(currentY) %*% solve(Omega) %*% currentY/2 )
   if (is.nan(t)){
     print(det(Omega))
     return (100000000000)
@@ -63,7 +63,6 @@ density.sigma.all.grad <- function(sigma){
   }
   lastsigma <- sigma
   invOmega <- solve(Omega)
-  detOmega <- det(Omega)
   ret <- array(0,dim=c(idx))
   for (k in 1:(idx)){
     ret[k] <- sum(rowSums((invOmega)* (t(K[k,,]))))/2-t(currentY) %*% invOmega %*% K[k,,] %*% invOmega %*% currentY/2
