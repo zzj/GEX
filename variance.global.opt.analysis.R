@@ -40,7 +40,7 @@ density.sigma <- function(x){
   currentcomp=K[current,,]
   Omega=x*currentcomp+R
 #  print(Omega)
-  t <- -(-size/2*log(2*pi)-((determinant(Omega,logarithm=T)$modulus)/2-t(currentY) %*% solve(Omega) %*% currentY/2)
+  t <- -(-size/2*log(2*pi)-((determinant(Omega,logarithm=T)$modulus)/2-t(currentY) %*% solve(Omega) %*% currentY/2))
   if (is.infinite(t)){
     print(Omega)
     print(t)
@@ -58,7 +58,9 @@ density.sigma.all <- function(sigma){
   }
   lastsigma <- sigma
   if (sum(sigma)==0) return (Inf)
-  t <- -(-size/2*log(2*pi)-((determinant(Omega,logarithm=T))$modulus)/2-t(currentY) %*% solve(Omega) %*% currentY/2 )
+
+  t <- (-(-size/2*log(2*pi)-((determinant(Omega,logarithm=T))$modulus)/2-t(currentY) %*% solve(Omega) %*% currentY/2 ))
+
   if (is.infinite(t)){
     return (Inf)
   }
