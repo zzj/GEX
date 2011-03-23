@@ -295,7 +295,7 @@ function gex_load_gene_expression($config, $specified_subject_list=NULL, $requir
                     /* build gene_expression index */
                     if ($config->gene_filter_gender) {
                          $gender=file($config->gene_expression_gender, $flag=FILE_IGNORE_NEW_LINES);
-                         $gene_gender_list=split("\t", $gender[0]);
+                         $gene_gender_list=preg_split("/[\s]+/", $gender[0]);
                     }
                }
                else {
