@@ -68,7 +68,7 @@ gex.mhtplot <- function(markers,chrid,genestart,geneend,ps,phenotypename,logscal
   hcolor <- rep("red",glen)
   print(hcolor)
   par(las=2, xpd=TRUE, cex.axis=1.8, cex=0.4)
-  ops <- mht.control(colors=color,yline=1.5,xline=3,cex=10)
+  ops <- mht.control(colors=color,yline=1.5,xline=3,cex=2)
   hops <- hmht.control(data=hdata,colors=hcolor)
   mhtplot(mydata,ops,hops,pch=19)
   abline(v=max(which(markers[,2]==chrid & markers[,3]<genestart)),col='red')
@@ -76,3 +76,7 @@ gex.mhtplot <- function(markers,chrid,genestart,geneend,ps,phenotypename,logscal
   title(paste("Manhattan plot with gene highlighted","chr=",chrid,"genepos=",genestart),cex.main=1.8)
 }
 
+
+gex.pvalue.hist <- function(x,title) {
+  hist(x,breaks=seq(0,1,by=0.05),xlab="p-value",ylab="count",main=title)
+}

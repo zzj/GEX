@@ -30,14 +30,14 @@ variance.qtl.result <- function(filename){
 
 
 std.analysis <- function(datafolder, phenotypename,X,Y){
-num.snps=dim(X)[1]
-p=mat.or.vec(num.snps,1)
-for (j in 1:(num.snps)){
-  snp=as.matrix(X[j,])
-  s=(anova(glm(Y~ snp)))
-  p[j]=pchisq(s$Deviance[2],1, lower.tail=F)
-}
-save(p,file=paste(datafolder,phenotypename,".Rdata",sep=""))
+  num.snps=dim(X)[1]
+  p=mat.or.vec(num.snps,1)
+  for (j in 1:(num.snps)){
+    snp=as.matrix(X[j,])
+    s=(anova(glm(Y~ snp)))
+    p[j]=pchisq(s$Deviance[2],1, lower.tail=F)
+  }
+  save(p,file=paste(datafolder,phenotypename,".Rdata",sep=""))
 }
 
 std.plot <- function(datafolder, phenotypename, markers,chrid,genestart,geneend){
@@ -48,7 +48,18 @@ std.plot <- function(datafolder, phenotypename, markers,chrid,genestart,geneend)
   dev.off();
 }
 
-std.qtl.result <- function(filename){
+std.pvalue.hist.plot <- function(datafolder, phenotypename, markers, chrid, genestart, geneend){
+  markers=data.matrix(read.table(paste(genotypefolder,'marker_list',sep="")))
+  load(file=paste(datafolder, phenotypename, ".Rdata",sep=""))
+  png(paste(datafolder,phenotypename,"_std_hist.png",sep=""))
+  gex.pvalue.hist(p,phenotypename)
+  dev.off();
+}
+
+std.qtl.result <- function(filename, log=T){
   load(file=filename)
-  return (-log(p))
+  if (log)
+    return (-log(p))
+  else
+    return (p)
 }

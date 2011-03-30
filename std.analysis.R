@@ -7,5 +7,7 @@ if (fun=='analysis'){
   std.analysis(datafolder, phenotypename,X,Y)
 }else if (fun=='plot'){
   std.plot(datafolder, phenotypename,markers,chrid,genestart,geneend)
+  std.pvalue.hist.plot(datafolder, phenotypename,markers,chrid,genestart,geneend)
 }
+
 

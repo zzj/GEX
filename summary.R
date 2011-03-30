@@ -101,6 +101,15 @@ if (fun=='variance') {
   dev.off()
 } else  if (fun=='std') {
   resultfilename <- 'eqtl_std'
+  Img <- std.qtl.result(stdfilelist[1],F)
+  idx <- seq(0,length(Img),by=10)
+  for (i in 2:length(stdfilelist)){
+    Img <- c(Img, std.qtl.result(stdfilelist[i],F)[idx])
+  }
+  save(Img, file=paste(resultfolder,'/',resultfilename,'_pvalue.Rdata',sep=""))
+  pdf(paste(resultfolder,'/',resultfilename,'_pvalue.pdf',sep=""))
+  hist(Img, breaks=seq(0,1,by=0.05),xlab='pvalue',ylab='count',main='std pvalue histogram');
+  dev.off()
   Img <- pvec(stdfilelist,gex.prepare.plot.eqtl,std.qtl.result,idx,groups)
   Img <- do.call(rbind, Img)
   save(Img, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
