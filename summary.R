@@ -73,8 +73,6 @@ gex.prepare.plot.eqtl <- function(filelist,qtlresultfun,totalinterval,groups){
     result <- qtlresultfun(filelist[i])
     if (is.null(groups)) t <- result[]
     else t <- ((as.numeric(tapply(result,groups,max))))
-    if (max(t)!=0)
-      t <- t/max(t)
     Img[[i]] <- t
   }
   (Img)
@@ -88,7 +86,7 @@ if (fun=='variance') {
   save(Img, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
   mycolors <- jet.colors(16)
   pdf(paste(resultfolder,'/',resultfilename,'.pdf',sep=""))
-  imagesc(Img*16, xlab = "pos", ylab = "gene", col = mycolors )
+  imagesc((Img/max(Img))*16, xlab = "pos", ylab = "gene", col = mycolors )
   dev.off()
 }else  if (fun=='lasso') {
   resultfilename <- 'eqtl_lasso'
@@ -97,7 +95,7 @@ if (fun=='variance') {
   save(Img, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
   mycolors <- jet.colors(16)
   pdf(paste(resultfolder,'/',resultfilename,'.pdf',sep=""))
-  imagesc(Img*16, xlab = "pos", ylab = "gene", col = mycolors )
+  imagesc((Img/max(Img))*16, xlab = "pos", ylab = "gene", col = mycolors )
   dev.off()
 } else  if (fun=='std') {
   resultfilename <- 'eqtl_std'
@@ -106,7 +104,7 @@ if (fun=='variance') {
   save(Img, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
   mycolors <- jet.colors(16)
   pdf(paste(resultfolder,'/',resultfilename,'.pdf',sep=""))
-  imagesc(Img*16, xlab = "pos", ylab = "gene", col = mycolors )
+  imagesc((Img/max(Img))*16, xlab = "pos", ylab = "gene", col = mycolors )
   dev.off()
 }
 
