@@ -25,7 +25,12 @@ lasso.qtl.result <- function(filename){
 
 variance.qtl.result <- function(filename){
   load(file=filename)
-  return (optresult$par[-length(optresult$par)])
+#  return (optresult$par[-length(optresult$par)])
+  t <- optresult$par
+  t <- t/max(t)
+  t[t>0.1]=1
+  t[t<0.1]=0
+  t
 }
 
 
@@ -50,5 +55,18 @@ std.plot <- function(datafolder, phenotypename, markers,chrid,genestart,geneend)
 
 std.qtl.result <- function(filename){
   load(file=filename)
-  return (-log(p))
+  t= (-log(p))
+  t[t<=7]=0
+  t[t>7]=1
+  return (t)
+}
+
+
+emma.qtl.result <- function(filename){
+  load(file=filename)
+  t <- (-log(result$ps))
+  t[t<=7]=0
+  t[t>7]=1
+  return (t)
+  
 }

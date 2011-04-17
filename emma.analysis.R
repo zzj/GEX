@@ -34,31 +34,36 @@ if(length(args)==0){
   }
 }
 
-gex.emma.mapping <- function(phenotypename, phenotypefile, chrid, genotypefolder, kinshipfolder, datafolder, a, b,rangestart, rangeend, genestart,geneend){
-  load(paste(kinshipfolder,"kinships.Rdata",sep=""))
+gex.emma.mapping <- function(phenotypename, phenotypefile, chrid, genotypefolder, kinshipfolder, variancefile, datafolder, a, b,rangestart, rangeend, genestart,geneend){
   Y=data.matrix(read.table(phenotypefile))
   Y
   markers=data.matrix(read.table(paste(genotypefolder,'marker_list',sep="")))
   for ( i in a:b){
-    x=data.matrix(read.table(paste(genotypefolder,i,'.genotype',sep=""),na.string='N'))
-    x=x/2
-    if (i==a){
-      X=x
-    } else{
-      X=rbind(X,x)
-    }
-    if (chrid==i){
-      chrg <- x
+    if (file.exists(paste(genotypefolder,i,'.genotype',sep=""))){
+    
+      x=data.matrix(read.table(paste(genotypefolder,i,'.genotype',sep=""),na.string='N'))
+      x=x/2
+      if (i==a){
+        X=x
+      } else{
+        X=rbind(X,x)
+      }
+      if (chrid==i){
+        chrg <- x
+      }
     }
   }
   selected=which((markers[,3]>=rangestart) & (markers[,3]<=rangeend) & (markers[,2]==chrid))
   XX=X[selected,]
+  load(variancefile)
 #  positions=markers[selected,3]
 #  ret=emma.REML.t(Y,X,globalkinship)
 #  retchr=emma.REML.t(Y,X,chrkinships[[chrid]])
+#
   retren=emma.REML.t(Y,X,emma.kinship(XX))
+  result=emma.REML.t(Y,X,TotalVariance)
 #  save(ret,retchr,retren,file=paste(datafolder,phenotypename,"_append.Rdata",sep=""))
-  save(retren,file=paste(datafolder,phenotypename,"_append.Rdata",sep=""))
+  save(result,file=paste(datafolder,phenotypename,".Rdata",sep=""))
 }
 
 
@@ -136,6 +141,6 @@ plot(positions,-log10(retchr$ps), type="o", pch=22, lty=2, col="red")
 
 }
 
-gex.emma.mapping.plot(phenotypename, phenotypefile, chrid, genotypefolder, kinshipfolder, datafolder, a,b,rangestart,rangeend, genestart,geneend)
+gex.emma.mapping(phenotypename, phenotypefile, chrid, genotypefolder,  kinshipfolder, variancefile,datafolder, a,b,rangestart,rangeend, genestart,geneend)
 
 

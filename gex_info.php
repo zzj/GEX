@@ -162,6 +162,7 @@ function gex_r_analysis($config, $resultfolder, $r_file, $r_fun=NULL){
                continue;
           }
 		  $value=$meta_idx[$key];
+          # no sex chromosome
           if ((int)$value[0]==0) continue;
 		  $string=gex_r_command($config);
 		  $string=gex_r_append_parameter($string,'chrid',(int)$value[0]);

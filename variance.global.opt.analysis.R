@@ -114,7 +114,11 @@ upper <- array(var(Y)*3,c(idx))
 optresult <- nlminb(sigma, density.sigma.all, density.sigma.all.grad, lower=lower)
 print(optresult)
 result <- optresult$par
-save(chrid, genestart,result, optresult,file=paste(datafolder,phenotypename,"_global_nlminb.Rdata",sep=""))
+TotalVariance<-array(0,dim=c(size,size))
+for (k in 1:(idx-1)){
+  TotalVariance<-TotalVariance + result[k]*K[k,,]
+}
+save(chrid, genestart,result, TotalVariance, optresult,file=paste(datafolder,phenotypename,"_global_nlminb.Rdata",sep=""))
 
 #r <- DEoptim(density.sigma.all,lower,upper,control = DEoptim.control(NP = 50))
 # r$member$bestmemit[200,]
