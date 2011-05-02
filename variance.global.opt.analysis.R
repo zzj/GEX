@@ -76,7 +76,10 @@ density.sigma.all.grad <- function(sigma){
   invOmega <- solve(Omega)
   ret <- array(0,dim=c(idx))
   for (k in 1:(idx)){
-    ret[k] <- sum(rowSums((invOmega)* (t(K[k,,]))))/2-t(currentY) %*% invOmega %*% K[k,,] %*% invOmega %*% currentY/2
+    # The first part is to calcuate the trace of the product of two matrix
+    # And this is a faster way to do so. 
+    # http://tolstoy.newcastle.edu.au/R/help/06/04/24721.html
+    ret[k] <- sum(rowSums((invOmega)* t(K[k,,])))/2-t(currentY) %*% invOmega %*% K[k,,] %*% invOmega %*% currentY/2
   }
   ret
 }
@@ -111,7 +114,7 @@ niter<-10
 currentY <- Y-mean(Y)
 lower <- array(0,c(idx))
 upper <- array(var(Y)*3,c(idx))
-optresult <- nlminb(sigma, density.sigma.all, density.sigma.all.grad, lower=lower)
+optresult <- nlminb(sigma, density.sigma.all, density.sigma.all.grad, lower=lower, control=list(iter.max=100000))
 print(optresult)
 result <- optresult$par
 TotalVariance<-array(0,dim=c(size,size))

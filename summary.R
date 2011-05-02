@@ -126,6 +126,15 @@ if (fun=='variance') {
   dev.off()
 } else  if (fun=='emma') {
   resultfilename <- 'eqtl_emma'
+  Img <- emma.qtl.result(emmafilelist[1],F)
+  idx <- seq(0,length(Img),by=10)
+  for (i in 2:length(emmafilelist)){
+    Img <- c(Img, emma.qtl.result(emmafilelist[i],F)[idx])
+  }
+  save(Img, file=paste(resultfolder,'/',resultfilename,'_pvalue.Rdata',sep=""))
+  pdf(paste(resultfolder,'/',resultfilename,'_pvalue.pdf',sep=""))
+  hist(Img, breaks=seq(0,1,by=0.05),xlab='pvalue',ylab='count',main='emma with modified pvalue histogram');
+  dev.off()
   Img <- pvec(emmafilelist,gex.prepare.plot.eqtl,emma.qtl.result,idx,groups)
   Img <- do.call(rbind, Img)
   save(Img, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
