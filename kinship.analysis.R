@@ -48,13 +48,10 @@ gex.build.kinship.by.chr <- function(genotypefolder, datafolder, a,b){
   save(chrkinships, globalkinship,file=paste(datafolder,"kinships.Rdata",sep=""));
 }
 
-gex.build.kinship.by.region <- function(genotypefolder, datafolder,a,b,step){
+gex.build.kinship.by.region <- function(genotypefolder, datafolder,a,b,step,overlap){
   idx <- 1
   size <- 1
   markers=data.matrix(read.table(paste(genotypefolder,'marker_list',sep="")))
-  datafolder <- file.path(datafolder, paste("local",step,sep="_"))
-  print(datafolder)
-  dir.create(datafolder,showWarnings=F)
   zlim=c(0.3,1)
   nk <- 1
   for ( i in a:b){
@@ -90,7 +87,7 @@ gex.build.kinship.by.region <- function(genotypefolder, datafolder,a,b,step){
           gex.kinship.image(K[idx,,],datafolder,paste("chr_",i,"_local_",idx,"markers_",K.num[idx],sep=""),zlim)
           idx <- idx+1
         }
-      minpos <- minpos+step
+        minpos <- minpos+step/overlap
       }
     }
   }
@@ -103,5 +100,5 @@ gex.build.kinship.by.region <- function(genotypefolder, datafolder,a,b,step){
 }
   
 #gex.build.kinship(genotypefolder,datafolder,a,b);
-gex.build.kinship.by.region(genotypefolder, datafolder,a,b,step)
+gex.build.kinship.by.region(genotypefolder, datafolder,a,b,step,overlap)
 

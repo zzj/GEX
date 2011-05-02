@@ -92,12 +92,12 @@ density.sigma.batch <- function(x){
 Y=data.matrix(read.table(phenotypefile))
 is.known=(!is.na(Y))
 Y <- Y[is.known]
-Y <- Y*100
+Y <- Y
 Y <- Y-mean(Y)
 size=length(Y)
 markers=data.matrix(read.table(paste(genotypefolder,'marker_list',sep="")))
 cauchy.p <- 10
-load(paste(kinshipfolder,'/local_',step,'/local.kinships.Rdata',sep=""))
+load(paste(kinshipfolder,'/local.kinships.Rdata',sep=""))
 K <- K[,is.known, is.known]
 idx <- dim(K)[1]
 sigma <- array(0,dim=c(idx))
@@ -123,5 +123,3 @@ for (k in 1:(idx-1)){
 }
 save(chrid, genestart,result, TotalVariance, optresult,file=paste(datafolder,phenotypename,"_global_nlminb.Rdata",sep=""))
 
-#r <- DEoptim(density.sigma.all,lower,upper,control = DEoptim.control(NP = 50))
-# r$member$bestmemit[200,]

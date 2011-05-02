@@ -34,6 +34,30 @@ if(length(args)==0){
   }
 }
 
+gex.variance.emma.mapping <- function(phenotypename, phenotypefile, chrid, genotypefolder, kinshipfolder, variancefile, datafolder, a, b,rangestart, rangeend, genestart,geneend){
+  Y=data.matrix(read.table(phenotypefile))
+  load(variancefile)
+  markers=data.matrix(read.table(paste(genotypefolder,'marker_list',sep="")))
+  for ( i in a:b){
+    if (file.exists(paste(genotypefolder,i,'.genotype',sep=""))){
+    
+      x=data.matrix(read.table(paste(genotypefolder,i,'.genotype',sep=""),na.string='N'))
+      x=x/2
+      if (i==a){
+        X=x
+      } else{
+        X=rbind(X,x)
+      }
+      if (chrid==i){
+        chrg <- x
+      }
+    }
+  }
+  result=emma.REML.t(Y,X,TotalVariance)
+  save(result,file=paste(datafolder,phenotypename,".Rdata",sep=""))
+}
+
+
 gex.emma.mapping <- function(phenotypename, phenotypefile, chrid, genotypefolder, kinshipfolder, variancefile, datafolder, a, b,rangestart, rangeend, genestart,geneend){
   Y=data.matrix(read.table(phenotypefile))
   Y
@@ -55,14 +79,7 @@ gex.emma.mapping <- function(phenotypename, phenotypefile, chrid, genotypefolder
   }
   selected=which((markers[,3]>=rangestart) & (markers[,3]<=rangeend) & (markers[,2]==chrid))
   XX=X[selected,]
-  load(variancefile)
-#  positions=markers[selected,3]
-#  ret=emma.REML.t(Y,X,globalkinship)
-#  retchr=emma.REML.t(Y,X,chrkinships[[chrid]])
-#
   retren=emma.REML.t(Y,X,emma.kinship(XX))
-  result=emma.REML.t(Y,X,TotalVariance)
-#  save(ret,retchr,retren,file=paste(datafolder,phenotypename,"_append.Rdata",sep=""))
   save(result,file=paste(datafolder,phenotypename,".Rdata",sep=""))
 }
 
@@ -115,32 +132,12 @@ gex.emma.mapping.plot <- function(phenotypename, phenotypefile, chrid, genotypef
   gex.emma.mhtplot(markers,chrid,genestart,geneend,retren$vgs,phenotypename)
   dev.off();
 }
-#}
-comment <- function(){
 
-  plot( positions,-log10(ret$ps), type="o", col="blue")
-  lines(positions,-log10(retchr$ps), type="o", pch=22, lty=2, col="red")
-  lines(positions,-log10(retren$ps), type="o", pch=23, lty=3, col="black")
-  abline(v=genestart)
-  abline(v=geneend)
-  dev.off();
-  pdf(paste(datafolder,phenotypename,"global.pdf",sep="") )
-  plot( positions,-log10(ret$ps), type="o", col="blue")
-  abline(v=genestart)
-  abline(v=geneend)
-  dev.off();
-  pdf(paste(datafolder,phenotypename,"chr.pdf",sep="") )
-plot(positions,-log10(retchr$ps), type="o", pch=22, lty=2, col="red")
-  abline(v=genestart)
-  abline(v=geneend)
-  dev.off();
-  pdf(paste(datafolder,phenotypename,"local.pdf",sep="") )
-  plot(positions,-log10(retren$ps), type="o", pch=23, lty=3, col="black")
-  abline(v=genestart)
-  abline(v=geneend)
+if (fun=='emma'){
+  gex.emma.mapping(phenotypename, phenotypefile, chrid, genotypefolder,  kinshipfolder, variancefile,datafolder, a,b,rangestart,rangeend, genestart,geneend)
+}else (fun=='emma_variance')
+  gex.variance.emma.mapping(phenotypename, phenotypefile, chrid, genotypefolder,  kinshipfolder, variancefile,datafolder, a,b,rangestart,rangeend, genestart,geneend)
 
-}
-
-gex.emma.mapping(phenotypename, phenotypefile, chrid, genotypefolder,  kinshipfolder, variancefile,datafolder, a,b,rangestart,rangeend, genestart,geneend)
+  
 
 

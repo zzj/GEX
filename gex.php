@@ -15,16 +15,17 @@ else {
 }
 
 
+
 $config=json_decode(file_get_contents($config_file));
 
 if ($config==NULL) die("Can not parse ". $config_file);
 echo " Start initializing Project $config->project_name ...\n" ;
-$config->emma_result_folder="emma";
-$config->variance_result_folder="variance";
+$config->emma_result_folder="emma/emma"."_".$config->kinship_region_size."_".$config->overlap;
+$config->variance_result_folder="variance/variance"."_".$config->kinship_region_size."_".$config->overlap;
 $config->std_result_folder="std";
 $config->lasso_result_folder="lasso";
 $config->summary_result_folder="summary";
-$config->kinship_result_folder="kinship";
+$config->kinship_result_folder="kinship/kinship"."_".$config->kinship_region_size."_".$config->overlap;
 
 
 $actions=split(',', $config->actions);
@@ -36,7 +37,9 @@ foreach($actions as $action){
 	 else if ($action=='kinship_analysis')
 		  gex_kinship_analysis($config);
 	 else if ($action=='emma_analysis')
-		  gex_emma_analysis($config);
+		  gex_emma_analysis($config,"emma");
+	 else if ($action=='emma_variance_analysis')
+		  gex_emma_analysis($config,"emma_variance");
 	 else if ($action=='variance_analysis')
 		  gex_variance_analysis($config);
 	 else if ($action=='variance_local_opt_analysis')
