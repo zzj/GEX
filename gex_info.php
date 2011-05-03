@@ -26,6 +26,14 @@ function gex_get_summary_folder($config){
 	 return $folder;
 }
 
+function gex_get_probe_summary_folder($config){
+	 $folder=gex_get_project_result_folder($config).$config->probe_summary_result_folder."/";
+	 if (!file_exists($folder)){
+		  mkdir($folder);
+	 }
+	 return $folder;
+}
+
 function gex_get_variance_folder($config){
 
 	 $folder=gex_get_project_result_folder($config).$config->variance_result_folder."/";
@@ -179,6 +187,9 @@ function gex_r_analysis($config, $resultfolder, $r_file, $r_fun=NULL){
 		  gex_check_folder($resultfolder2);
 		  $string=gex_r_append_parameter($string,'datafolder',$resultfolder2);
           $string=gex_r_append_parameter($string,'kinshipfolder',gex_get_kinship_folder($config));
+          $string=gex_r_append_parameter($string,'stdfolder',gex_get_std_folder($config).'/'.$gene_idx[$key].'/');
+          $string=gex_r_append_parameter($string,'variancefolder',gex_get_variance_folder($config).'/'.$gene_idx[$key].'/');
+          $string=gex_r_append_parameter($string,'emmafolder',gex_get_emma_folder($config).'/'.$gene_idx[$key].'/');
           $string=gex_r_append_parameter($string,'step',$config->kinship_region_size);
 		  $string=gex_r_command_end($string,$r_file);
 		  fprintf($fd,$string."\n");

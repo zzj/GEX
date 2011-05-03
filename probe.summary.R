@@ -1,0 +1,119 @@
+##First read in the arguments listed at the command line
+args=(commandArgs(TRUE))
+options(scipen=4)
+library(emma)
+library('DEoptim')
+library('qvalue')
+library(gap)
+source('lib/imageplot.R')
+source('methods.R')
+source('lib/imageplot.R')
+##args is now a list of character vectors
+## First check to see if arguments are passed.
+## Then cycle through each element of the list and evaluate the expressions.
+if(length(args)==0){
+  print("No arguments supplied.")
+  a=1
+  b=19
+  print("No arguments supplied.")
+  a=1
+  b=19
+  a=1
+  b=19
+  genotypefolder="result/precc_liver_gene_expression/genotype/"
+  kinshipfolder="result/precc_liver_gene_expression/kinship/"
+  chrid=3
+  genestart=105762278
+  geneend=105772678
+  rangestart=102910198
+  rangeend=112949064
+  phenotypename="ENSMUSG00000000001"
+  phenotypefile="result/precc_liver_gene_expression/gene_expression/0/ENSMUSG00000000001"
+  step=10000000
+  datafolder="result/precc_liver_gene_expression/emma/0/"
+  kinshipfolder="result/gse13870_female/kinship/local_10000000/local.kinships.Rdata"
+  ##supply default values
+}else{
+  for(i in 1:length(args)){
+    eval(parse(text=args[[i]]))
+  }
+}
+gex.emma.mhtplot <- function(markers,chrid,genestart,geneend,ps,phenotypename){
+  mydata=(as.matrix(cbind(as.integer(markers[,2]),as.integer(markers[,3]),as.numeric(ps))))
+  selected=which((markers[,3]>=genestart) & (markers[,3]<=geneend) & (markers[,2]==chrid))
+  if (length(selected)==1)
+    hdata=as.data.frame(cbind(t(mydata[selected,]),(rep(phenotypename,length(selected)))))
+  else 
+    hdata=as.data.frame(cbind((mydata[selected,]),(rep(phenotypename,length(selected)))))
+  print(dim(hdata))
+  if (dim(hdata)[2]==0){
+    hdata <- NULL
+  }
+  color <- rep(c("lightgray","gray"),11)
+  glen <- length(selected)
+  hcolor <- rep("red",glen)
+  print(hcolor)
+  par(las=2, xpd=TRUE, cex.axis=1.8, cex=0.4)
+  ops <- mht.control(colors=color,yline=1.5,xline=3)
+  hops <- hmht.control(data=hdata,colors=hcolor)
+  mhtplot(mydata,ops,hops,pch=19)
+  abline(v=max(which(markers[,2]==chrid & markers[,3]<genestart)),col='red')
+  axis(2,pos=2,at=1:16)
+  title(paste("Manhattan plot with gene highlighted","chr=",chrid,"genepos=",genestart,"max=",max((mydata[,3])),", min=",min(mydata[,3])),cex.main=1.8)
+}
+gex.std.mhtplot <- function(markers,chrid,genestart,geneend,ps,phenotypename){
+  mydata=(as.matrix(cbind(as.integer(markers[,2]),as.integer(markers[,3]),as.numeric(ps))))
+  selected=which((markers[,3]>=genestart) & (markers[,3]<=geneend) & (markers[,2]==chrid))
+  if (length(selected)==1)
+    hdata=as.data.frame(cbind(t(mydata[selected,]),(rep(phenotypename,length(selected)))))
+  else 
+    hdata=as.data.frame(cbind((mydata[selected,]),(rep(phenotypename,length(selected)))))
+  print(dim(hdata))
+  if (dim(hdata)[2]==0){
+    hdata <- NULL
+  }
+  color <- rep(c("lightgray","gray"),11)
+  glen <- length(selected)
+  hcolor <- rep("red",glen)
+  print(hcolor)
+  par(las=2, xpd=TRUE, cex.axis=1.8, cex=0.4)
+  ops <- mht.control(colors=color,yline=1.5,xline=3)
+  hops <- hmht.control(data=hdata,colors=hcolor)
+  mhtplot(mydata,ops,hops,pch=19)
+  abline(v=max(which(markers[,2]==chrid & markers[,3]<genestart)),col='red')
+  axis(2,pos=2,at=1:16)
+  title(paste("Manhattan plot with gene highlighted","chr=",chrid,"genepos=",genestart,"max=",max((mydata[,3])),", min=",min(mydata[,3])),cex.main=1.8)
+}
+
+
+filename=paste(emmafolder,phenotypename,".Rdata",sep="")
+if(file.exists(filename)){
+  ## plot emma result
+  load(file=filename)
+  markers=data.matrix(read.table(paste(genotypefolder,'marker_list',sep="")))
+  load(file=filename)
+  png(paste(datafolder,phenotypename,"_emma_global.png",sep="") ,width=1440)
+  gex.emma.mhtplot(markers,chrid,genestart,geneend,result$ps,phenotypename)
+  dev.off();
+  png(paste(datafolder,phenotypename,"_emma_global_ves.png",sep="")  ,width=1440)
+  gex.emma.mhtplot(markers,chrid,genestart,geneend,result$ves,phenotypename)
+  dev.off();
+  png(paste(datafolder,phenotypename,"_emma_global_vgs.png",sep="")  ,width=1440)
+  gex.emma.mhtplot(markers,chrid,genestart,geneend,result$vgs,phenotypename)
+  dev.off();
+  png(paste(datafolder,phenotypename,"_emma_hist",sep=""))
+  hist(result$ps, breaks=seq(0,1,by=0.05),xlab='pvalue',ylab='count',main='emma with variance pvalue histogram');
+  dev.off()
+}
+filename=paste(stdfolder,phenotypename,".Rdata",sep="")
+if(file.exists(filename)){
+  ## plot emma result
+  markers=data.matrix(read.table(paste(genotypefolder,'marker_list',sep="")))
+  pvalue <- std.qtl.result(filename,F)
+  png(paste(datafolder,phenotypename,"_std_global.png",sep="") ,width=1440)
+  gex.std.mhtplot(markers,chrid,genestart,geneend,pvalue,phenotypename)
+  dev.off();
+  png(paste(datafolder,phenotypename,"_std_hist",sep=""))
+  hist(pvalue, breaks=seq(0,1,by=0.05),xlab='pvalue',ylab='count',main='std with variance pvalue histogram');
+  dev.off()
+}

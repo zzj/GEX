@@ -5,18 +5,26 @@ include_once('gex_init.php');
 
 
 function gex_summary($config, $type){
-	 $summaryfolder=gex_get_summary_folder($config);
-	 $geneexpfolder=gex_get_gene_expression_folder($config);
-     $string=gex_r_command($config);
-     $string=gex_r_append_parameter($string,'resultfolder',$summaryfolder);
-     $string=gex_r_append_parameter($string,'geneexpfolder',$geneexpfolder);
-     $string=gex_r_append_parameter($string,'fun',$type);
-     $string=gex_r_append_parameter($string,'step', $config->plot_region_size);
-     $string=gex_r_append_parameter($string,'rough.scan', $config->rough_scan);
-     $string=gex_r_append_parameter($string,'root',gex_get_project_result_folder($config));
-     $string=gex_r_command_end($string,'summary.R','/dev/tty');
-     printf($string."\n");
-     system($string);
+     if ($type=='probe'){
+          gex_r_analysis($config, gex_get_probe_summary_folder($config), "probe.summary.R", "summary");
+     }
+     else {
+          $summaryfolder=gex_get_summary_folder($config);
+          $geneexpfolder=gex_get_gene_expression_folder($config);
+          $string=gex_r_command($config);
+          $string=gex_r_append_parameter($string,'resultfolder',$summaryfolder);
+          $string=gex_r_append_parameter($string,'emmafolder',gex_get_emma_folder($config));
+          $string=gex_r_append_parameter($string,'variancefolder',gex_get_variance_folder($config));
+          $string=gex_r_append_parameter($string,'resultfolder',$summaryfolder);
+          $string=gex_r_append_parameter($string,'geneexpfolder',$geneexpfolder);
+          $string=gex_r_append_parameter($string,'fun',$type);
+          $string=gex_r_append_parameter($string,'step', $config->plot_region_size);
+          $string=gex_r_append_parameter($string,'rough.scan', $config->rough_scan);
+          $string=gex_r_append_parameter($string,'root',gex_get_project_result_folder($config));
+          $string=gex_r_command_end($string,'summary.R','/dev/tty');
+          printf($string."\n");
+          system($string);
+     }
 }
 
 ?>

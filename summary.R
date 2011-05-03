@@ -2,6 +2,7 @@
 args=(commandArgs(TRUE))
 library('multicore')
 library(emma)
+library('qvalue')
 source('lib/imageplot.R')
 source('lib/slice.R')
 source('methods.R')
@@ -21,13 +22,13 @@ if(length(args)==0){
    for(i in 1:length(args)){
     eval(parse(text=args[[i]]))
   }
-}
+} 
 
 
-gex.prepare.plot.eqtl <- function(filelist,qtlresultfun,totalinterval,groups){
+gex.prepare.plot.eqtl <- function(filelist,qtlresultfun,totalinterval,groups,log=T){
   Img <- list()
   for ( i in 1:length(filelist)){
-    result <- qtlresultfun(filelist[i])
+    result <- qtlresultfun(filelist[i],log)
     if (is.null(groups)) t <- result[]
     else t <- ((as.numeric(tapply(result,groups,max))))
     if (max(t)!=0) t=t/max(t)
@@ -35,7 +36,25 @@ gex.prepare.plot.eqtl <- function(filelist,qtlresultfun,totalinterval,groups){
   }
   Img
 }
-
+gex.qvalue <- function(index, pvaluematrix,groups){
+  n=dim(pvaluematrix[1])[1]
+  result <- list()
+  for (i in index){
+    qobj <- qvalue(pvaluematrix[[i]])
+    if (is.null(groups)) t <- qobje$qvalues
+    else t <- ((as.numeric(tapply(qobj$qvalues,groups,min))))
+    result[[i]] <- t
+  }
+  result
+}
+gex.load.pvalues <- function(loadfun, filelist){
+  Img <- loadfun(filelist[1],F)
+  idx <- seq(0,length(Img),by=10)
+  for (i in 2:length(filelist)){
+    Img <- c(Img, loadfun(filelist[i],F)[idx])
+  }
+  Img
+}
 
 # geneexpfolder : gene expression data
 # resultfolder : gene result folder
@@ -68,6 +87,7 @@ emmafilelist <- c()
 #names[i,5] gene end position
 names <- (read.table(paste(geneexpfolder,"gene_list",sep=""), stringsAsFactors =FALSE))
 for (i in 1:dim(names)[1]){
+  ##  if(i>50) break
   filename=paste(root,'/std/',names[i,2],'/',names[i,1],'.Rdata',sep='')
   if (file.exists(filename)){
     stdfilelist <- c(stdfilelist,filename)
@@ -76,21 +96,22 @@ for (i in 1:dim(names)[1]){
   if (file.exists(filename)){
     lassofilelist <- c(lassofilelist,filename)
   }    
-  filename=paste(root,'/emma/',names[i,2],'/',names[i,1],'.Rdata',sep='')
+  filename=paste(emmafolder,'/',names[i,2],'/',names[i,1],'.Rdata',sep='')
   if (file.exists(filename)){
     emmafilelist <- c(emmafilelist,filename)
   }    
-  filename=paste(root,'/variance/',names[i,2],'/',names[i,1],'_global_nlminb.Rdata',sep='')
+  filename=paste(variancefolder,'/',names[i,2],'/',names[i,1],'_global_nlminb.Rdata',sep='')
   if (file.exists(filename)){
     variancefilelist <- c(variancefilelist,filename)
   }
 }
 
 
+
 if (fun=='variance') {
   resultfilename <- 'eqtl_variance'
-  Img <- pvec((variancefilelist),gex.prepare.plot.eqtl,variance.qtl.result,idx,NULL)
-#  Img <- gex.prepare.plot.eqtl(variancefilelist, variance.qtl.result, idx,NULL)
+#  Img <- pvec((variancefilelist),gex.prepare.plot.eqtl,variance.qtl.result,idx,NULL)
+  Img <- gex.prepare.plot.eqtl(variancefilelist, variance.qtl.result, idx,NULL)
   Img <- do.call(rbind, Img)
   save(Img, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
   mycolors <- jet.colors(16)
@@ -160,5 +181,25 @@ if (fun=='variance') {
   }
   pdf(paste(resultfolder,'/',resultfilename,'.pdf',sep=""))
   imagesc((Img/max(Img))*16, xlab = "pos", ylab = "gene", col = jet.colors(16) )
+  dev.off()
+} else if (fun=='qvalue'){
+  resultfilename <- "std_qvalue"
+  idx <- seq(0,length(stdfilelist),by=10)
+  Img <- gex.prepare.plot.eqtl(stdfilelist,std.qtl.result,idx,NULL,F)
+  qv <- gex.qvalue(1:length(Img), Img,groups)
+  qv <- do.call(cbind, qv)
+  save(qv, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
+  pdf(paste(resultfolder,'/',resultfilename,'.pdf',sep=""))
+  imagesc((1-t(qv))*20, xlab = "pos", ylab = "gene", col = mycolors )
+  dev.off()
+  mycolors <- jet.colors(20)
+  resultfilename <- "emma_qvalue"
+  idx <- seq(0,length(emmafilelist),by=10)
+  Img <- gex.prepare.plot.eqtl(emmafilelist,emma.qtl.result,idx,NULL,F)
+  qv <- gex.qvalue(1:length(Img), Img,groups)
+  qv <- do.call(cbind, qv)
+  save(qv, file=paste(resultfolder,'/',resultfilename,'.Rdata',sep=""))
+  pdf(paste(resultfolder,'/',resultfilename,'.pdf',sep=""))
+  imagesc((1-t(qv))*20, xlab = "pos", ylab = "gene", col = mycolors )
   dev.off()
 }

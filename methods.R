@@ -65,8 +65,6 @@ std.qtl.result <- function(filename, log=T){
   load(file=filename)
   if (log){
     t= (-log(p))
-    t[t<=7]=0
-    t[t>7]=1
     return (t)
   }  else
     return (p)
@@ -77,8 +75,6 @@ emma.qtl.result <- function(filename,log=T){
   load(file=filename)
   if (log){
     t= (-log(result$ps))
-    t[t<=7]=0
-    t[t>7]=1
     return (t)
   }  else
     return (result$ps)

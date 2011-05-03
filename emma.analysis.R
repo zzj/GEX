@@ -79,7 +79,7 @@ gex.emma.mapping <- function(phenotypename, phenotypefile, chrid, genotypefolder
   }
   selected=which((markers[,3]>=rangestart) & (markers[,3]<=rangeend) & (markers[,2]==chrid))
   XX=X[selected,]
-  retren=emma.REML.t(Y,X,emma.kinship(XX))
+  result=emma.REML.t(Y,X,emma.kinship(XX))
   save(result,file=paste(datafolder,phenotypename,".Rdata",sep=""))
 }
 
@@ -95,7 +95,6 @@ gex.emma.mhtplot <- function(markers,chrid,genestart,geneend,ps,phenotypename){
   if (dim(hdata)[2]==0){
     hdata <- NULL
   }
-  print(hdata)
   color <- rep(c("lightgray","gray"),11)
   glen <- length(selected)
   hcolor <- rep("red",glen)
@@ -112,24 +111,14 @@ gex.emma.mhtplot <- function(markers,chrid,genestart,geneend,ps,phenotypename){
 gex.emma.mapping.plot <- function(phenotypename, phenotypefile, chrid, genotypefolder, kinshipfolder, datafolder, a, b,rangestart, rangeend, genestart,geneend){
   markers=data.matrix(read.table(paste(genotypefolder,'marker_list',sep="")))
   load(file=paste(datafolder, phenotypename, ".Rdata",sep=""))
-  load(file=paste(datafolder, phenotypename, "_append.Rdata",sep=""))
   png(paste(datafolder,phenotypename,"_global.png",sep="") ,width=1440)
-  gex.emma.mhtplot(markers,chrid,genestart,geneend,ret$ps,phenotypename)
-  dev.off();
-  png(paste(datafolder,phenotypename,"_local.png",sep="")  ,width=1440)
-  gex.emma.mhtplot(markers,chrid,genestart,geneend,retren$ps,phenotypename)
+  gex.emma.mhtplot(markers,chrid,genestart,geneend,result$ps,phenotypename)
   dev.off();
   png(paste(datafolder,phenotypename,"_global_ves.png",sep="")  ,width=1440)
-  gex.emma.mhtplot(markers,chrid,genestart,geneend,ret$ves,phenotypename)
+  gex.emma.mhtplot(markers,chrid,genestart,geneend,result$ves,phenotypename)
   dev.off();
   png(paste(datafolder,phenotypename,"_global_vgs.png",sep="")  ,width=1440)
-  gex.emma.mhtplot(markers,chrid,genestart,geneend,ret$vgs,phenotypename)
-  dev.off();
-  png(paste(datafolder,phenotypename,"_local_ves.png",sep="")  ,width=1440)
-  gex.emma.mhtplot(markers,chrid,genestart,geneend,retren$ves,phenotypename)
-  dev.off();
-  png(paste(datafolder,phenotypename,"_local_vgs.png",sep="")  ,width=1440)
-  gex.emma.mhtplot(markers,chrid,genestart,geneend,retren$vgs,phenotypename)
+  gex.emma.mhtplot(markers,chrid,genestart,geneend,result$vgs,phenotypename)
   dev.off();
 }
 

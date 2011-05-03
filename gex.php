@@ -24,8 +24,15 @@ $config->emma_result_folder="emma/emma"."_".$config->kinship_region_size."_".$co
 $config->variance_result_folder="variance/variance"."_".$config->kinship_region_size."_".$config->overlap;
 $config->std_result_folder="std";
 $config->lasso_result_folder="lasso";
-$config->summary_result_folder="summary";
+$config->summary_result_folder="summary/summary"."_".$config->kinship_region_size."_".$config->overlap;
+$config->probe_summary_result_folder="probe_summary/probe_summary"."_".$config->kinship_region_size."_".$config->overlap;
 $config->kinship_result_folder="kinship/kinship"."_".$config->kinship_region_size."_".$config->overlap;
+
+gex_check_folder(	 gex_get_project_result_folder($config).'emma');
+gex_check_folder(	 gex_get_project_result_folder($config).'std');
+gex_check_folder(	 gex_get_project_result_folder($config).'summary');
+gex_check_folder(	 gex_get_project_result_folder($config).'probe_summary');
+gex_check_folder(	 gex_get_project_result_folder($config).'kinship');
 
 
 $actions=split(',', $config->actions);
